@@ -7,6 +7,7 @@
 
 global start
 
+extern GDT_DESC
 
 ;; Saltear seccion de datos
 jmp start
@@ -40,19 +41,38 @@ start:
     ; Imprimir mensaje de bienvenida
     imprimir_texto_mr iniciando_mr_msg, iniciando_mr_len, 0x07, 0, 0
 
-
     ; Habilitar A20
 	call habilitar_A20
 
     ; Cargar la GDT
+    lgdt [GDT_DESC]
 
     ; Setear el bit PE del registro CR0
+    mov eax, cr0
+    or eax, 1
+    mov cr0, eax
 
     ; Saltar a modo protegido
+    jmp 0x40:modoprotegido
+
+	BITS 32
+	modoprotegido:
 
     ; Establecer selectores de segmentos
-
+	xor eax, eax
+	
+	; carga segmento de datos de nivel cero
+	mov ax, 0x48
+	mov ds, ax
+	mov es, ax
+	mov gs, ax
+	
+	; carga segmento de código de nivel cero
+	mov ax, 0x40
+	mov cs, ax
+	
     ; Establecer la base de la pila
+	mov esp, 0x27000
 
     ; Imprimir mensaje de bienvenida
 
@@ -97,3 +117,6 @@ start:
 ;; -------------------------------------------------------------------------- ;;
 
 %include "a20.asm"
+
+
+
