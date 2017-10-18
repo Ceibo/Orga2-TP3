@@ -1,0 +1,10 @@
+*.o
+*.bin
+*.tmp
+*.ctsko
+kernel.sym
+*.ctsk
+*.tsko
+*.tsk
+diskette.img
+/tmp/bochs.log
