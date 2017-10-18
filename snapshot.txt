@@ -1,5 +1,5 @@
 ¶niciando kernel (Modo Real)...
-
+Habilitando A20........OK!
 
 
 
