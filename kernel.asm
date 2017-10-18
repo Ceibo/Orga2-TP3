@@ -39,6 +39,9 @@ start:
     int 10h ; load 8x8 font
 
     ; Imprimir mensaje de bienvenida
+    ;0x07 -> color
+    ;0 -> fila
+    ;0 -> columna
     imprimir_texto_mr iniciando_mr_msg, iniciando_mr_len, 0x07, 0, 0
 
     ; Habilitar A20
