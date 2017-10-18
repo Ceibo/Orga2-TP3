@@ -82,12 +82,38 @@ void print_dec(uint numero, int size, uint x, uint y, unsigned short attr) {
     }
 }
 
-int ee_printf(const char *fmt, ...) {}
-void screen_pintar_rect(unsigned char c, unsigned char color, int fila, int columna, int alto, int ancho) {}
-void screen_pintar_linea_h(unsigned char c, unsigned char color, int fila, int columna, int ancho) {}
-void screen_pintar_linea_v(unsigned char c, unsigned char color, int fila, int columna, int alto) {}
-void screen_inicializar();
-void screen_pintar_puntajes() {}
+void screen_pintar_rect(unsigned char c, unsigned char color, int fila, int columna, int alto, int ancho) {
+	//color = C_MAKE_BG(color);
+	uint i, j;
+	for (i = fila; i < fila + alto; i++) {
+		for (j = columna; j < columna + ancho; j++) {
+			screen_pintar(c, color, i, j);
+		}
+	}
+}
+
+void screen_pintar_linea_h(unsigned char c, unsigned char color, int fila, int columna, int ancho) {
+	//color = C_MAKE_BG(color);
+	while (ancho-- > 0) {
+		screen_pintar(c, color, fila, columna++);
+	}
+}
+
+void screen_pintar_linea_v(unsigned char c, unsigned char color, int fila, int columna, int alto) {
+	//color = C_MAKE_BG(color);
+	while (alto-- > 0) {
+		screen_pintar(c, color, fila++, columna);
+	}
+}
+
+void screen_inicializar() {
+	clear_screen();
+	screen_pintar_rect(0, C_BG_LIGHT_GREY, 1, 0, 44, 80); // mapa con fondo gris
+	screen_pintar_rect(0, C_BG_RED, 44, 33, 5, 7); // barra de jugador rojo
+	screen_pintar_rect(0, C_BG_BLUE, 44, 40, 5, 7); // barra de jugador azul
+}
+
+/*void screen_pintar_puntajes() {}
 void screen_actualizar_reloj_pirata (jugador_t *j, pirata_t *pirata) {}
 unsigned char screen_color_jugador(jugador_t *j) {}
 unsigned char screen_caracter_pirata(unsigned int tipo) {}
@@ -98,4 +124,15 @@ void screen_pintar_reloj_piratas(jugador_t *j) {}
 void screen_pintar_relojes() {}
 void screen_actualizar_posicion_mapa(uint x, uint y) {}
 void screen_stop_game_show_winner(jugador_t *j) {}
+int ee_printf(const char *fmt, ...) {}*/
+
+// Escribe el caracter nulo en todas las celdas de la pantalla y pone fondo negro
+void clear_screen() {
+	uint fila, columna;
+	for (fila = 0; fila < VIDEO_FILS; fila++) {
+		for (columna = 0; columna < VIDEO_COLS; columna++) {
+			screen_pintar(0, C_BG_BLACK, fila, columna);
+		}
+	}
+}
 
