@@ -4,6 +4,7 @@
 ; ==============================================================================
 
 %include "imprimir.mac"
+%include "a20.asm"
 
 global start
 
@@ -42,6 +43,7 @@ start:
 
 
     ; Habilitar A20
+	call habilitar_A20
 
     ; Cargar la GDT
 
