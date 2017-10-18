@@ -25,10 +25,10 @@
 #define DESCRIPTOR_PRIVILEGE_LEVEL___ZERO 0x00
 #define DESCRIPTOR_PRIVILEGE_LEVEL___THREE 0x03
 
-#define GRANULARITY 0x01 // Sacado del ejemplo, confirmar
-
-#define SEGMENT_LIMIT_0_15 0x3FFF // Sacado del ejemplo, confirmar
-#define SEGMENT_LIMIT_19_16 0x00 // Sacado del ejemplo, confirmar
+// Direcciona los primeros 500MB
+#define GRANULARITY 0x01 // divide el segment limit por 4kb
+#define SEGMENT_LIMIT_0_15 0xF3FF
+#define SEGMENT_LIMIT_19_16 0x01
 
 #define SEGMENT_PRESENT___YES 0x01 // Sacado del ejemplo, confirmar. Por qué presente?
 
@@ -128,6 +128,23 @@ gdt_entry gdt[GDT_COUNT] = {
         (unsigned char)     DEFAULT_OPERATION_SIZE___32_BITS,
         (unsigned char)     GRANULARITY,
         (unsigned char)     SEGMENT_BASE_ADDRESS_31_24
+    },
+    
+    // Segmento para la pantalla utilizado solo por el kernel
+    [12] = (gdt_entry) {
+        (unsigned short)    0x0FBF, // segment limit 0-15
+        (unsigned short)    0x8000, // base address 0-15
+        (unsigned char)     0x0B, // base address 16-23
+        (unsigned char)     SEGMENT_TYPE___DATA_READ_WRITE,
+        (unsigned char)     DESCRIPTOR_TYPE___CODE_OR_DATA,
+        (unsigned char)     DESCRIPTOR_PRIVILEGE_LEVEL___THREE,
+        (unsigned char)     SEGMENT_PRESENT___YES,
+        (unsigned char)     0x00, // segment limit 16-19
+        (unsigned char)     AVAILABLE_FOR_USE_BY_SYSTEM_SOFTWARE,
+        (unsigned char)     CODE_SEGMENT_64_BIT,
+        (unsigned char)     DEFAULT_OPERATION_SIZE___32_BITS,
+        (unsigned char)     0x00, // granulatity = 0
+        (unsigned char)     0x00 // base address 24-31
     }
 };
 

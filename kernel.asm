@@ -64,12 +64,12 @@ start:
 	; carga segmento de datos de nivel cero
 	mov ax, 0x48
 	mov ds, ax
-	mov es, ax
+	mov ss, ax
 	mov gs, ax
 	
-	; carga segmento de código de nivel cero
-	mov ax, 0x40
-	mov cs, ax
+	; carga segmento de video
+	mov ax, 0x60
+	mov es, ax
 	
     ; Establecer la base de la pila
 	mov esp, 0x27000
