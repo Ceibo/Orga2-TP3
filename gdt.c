@@ -132,7 +132,7 @@ gdt_entry gdt[GDT_COUNT] = {
     
     // Segmento para la pantalla utilizado solo por el kernel
     [12] = (gdt_entry) {
-        (unsigned short)    0x0FBF, // segment limit 0-15
+        (unsigned short)    0x1F40, // segment limit 0-15
         (unsigned short)    0x8000, // base address 0-15
         (unsigned char)     0x0B, // base address 16-23
         (unsigned char)     SEGMENT_TYPE___DATA_READ_WRITE,

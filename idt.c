@@ -46,7 +46,7 @@ idt_descriptor IDT_DESC = {
 
 
 void idt_inicializar() {
-    IDT_ENTRY(0);
+    /*IDT_ENTRY(0);
     IDT_ENTRY(1);
     IDT_ENTRY(2);
     IDT_ENTRY(3);
@@ -65,10 +65,10 @@ void idt_inicializar() {
     IDT_ENTRY(16);
     IDT_ENTRY(17);
     IDT_ENTRY(18);
-    IDT_ENTRY(19);
+    IDT_ENTRY(19);*/
 }
 
-#define IDT_ENTRY(0)
+/*#define IDT_ENTRY(0)
     idt[0].offset_0_15 = (unsigned short) ((unsigned int)(&_isr ## 0) & (unsigned int) 0xFFFF);
     idt[0].segsel = (unsigned short) 0x00;
     idt[0].attr = (unsigned short) 0x0000;
@@ -189,3 +189,4 @@ void idt_inicializar() {
     idt[19].segsel = (unsigned short) 0x00;
     idt[19].attr = (unsigned short) 0x0000;
     idt[19].offset_16_31 = (unsigned short) ((unsigned int)(&_isr ## 19) >> 16 & (unsigned int) 0xFFFF);
+*/

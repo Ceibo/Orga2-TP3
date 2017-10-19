@@ -64,15 +64,14 @@ start:
     ; Establecer selectores de segmentos
 	xor eax, eax
 	
-	; carga segmento de datos de nivel cero
-	mov ax, 0x48
+	mov ax, 0x48 ; carga segmento de datos de nivel cero
 	mov ds, ax
+	mov es, ax
 	mov ss, ax
 	mov gs, ax
-	
-	; carga segmento de video
-	mov ax, 0x60
-	mov es, ax
+
+	mov ax, 0x60 ; carga segmento de video
+	mov fs, ax ; mov es, ax ???
 	
     ; Establecer la base de la pila
 	mov esp, 0x27000
@@ -108,6 +107,7 @@ start:
     ; Cargar tarea inicial
 
     ; Habilitar interrupciones
+    sti
 
     ; Saltar a la primera tarea: Idle
 
@@ -122,6 +122,11 @@ start:
 ;; -------------------------------------------------------------------------- ;;
 
 %include "a20.asm"
+
+limpiar_pantalla:
+	; recorrer la memoria desde 0x0 hasta el límite del segmento de
+	; video (sacarlo de la GDT) e ir escribiendo cero en cada posición
+ret
 
 
 
