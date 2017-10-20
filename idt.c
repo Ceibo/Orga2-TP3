@@ -19,21 +19,6 @@ idt_descriptor IDT_DESC = {
     (unsigned int) &idt
 };
 
-/*
-    La siguiente es una macro de EJEMPLO para ayudar a armar entradas de
-    interrupciones. Para usar, descomentar y completar CORRECTAMENTE los
-    atributos y el registro de segmento. Invocarla desde idt_inicializar() de
-    la siguiene manera:
-
-    void idt_inicializar() {
-        idt_entry(0);
-        ...
-        idt_entry(19);
-
-        ...
-    }
-*/
-
 #define IDT_ENTRY(numero)                                                                                        \
     idt[numero].offset_0_15 = (unsigned short) ((unsigned int)(&_isr ## numero) & (unsigned int) 0xFFFF);        \
     idt[numero].segsel = (unsigned short) 0x40;                                                                  \
@@ -44,31 +29,25 @@ idt_descriptor IDT_DESC = {
 // 1000 1110 0000 0000(o cualquier cosa en estos ultimos) Pasar esto a hexa para el atributo.
 // 0x8E00
 
-void print_isr(int i){
-    print("Codigo de error " ,2,2,0x7);
-    //IMPRIMIR EL ERROR Y VER COMO HACERLO
-
-}
-
 void idt_inicializar() {
-    idt_entry(0);
-    idt_entry(1);
-    idt_entry(2);
-    idt_entry(3);
-    idt_entry(4);
-    idt_entry(5);
-    idt_entry(6);
-    idt_entry(7);
-    idt_entry(8);
-    idt_entry(9);
-    idt_entry(10);
-    idt_entry(11);
-    idt_entry(12);
-    idt_entry(13);
-    idt_entry(14);
-    idt_entry(15);
-    idt_entry(16);
-    idt_entry(17);
-    idt_entry(18);
-    idt_entry(19);
+    IDT_ENTRY(0);
+    IDT_ENTRY(1);
+    IDT_ENTRY(2);
+    IDT_ENTRY(3);
+    IDT_ENTRY(4);
+    IDT_ENTRY(5);
+    IDT_ENTRY(6);
+    IDT_ENTRY(7);
+    IDT_ENTRY(8);
+    IDT_ENTRY(9);
+    IDT_ENTRY(10);
+    IDT_ENTRY(11);
+    IDT_ENTRY(12);
+    IDT_ENTRY(13);
+    IDT_ENTRY(14);
+    IDT_ENTRY(15);
+    IDT_ENTRY(16);
+    IDT_ENTRY(17);
+    IDT_ENTRY(18);
+    IDT_ENTRY(19);
 }

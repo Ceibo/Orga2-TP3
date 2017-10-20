@@ -10,6 +10,8 @@ global start
 extern GDT_DESC
 extern IDT_DESC
 extern idt_inicializar
+extern screen_inicializar
+extern imprimir_nombre_de_grupo
 
 ;; Saltear seccion de datos
 jmp start
@@ -85,6 +87,8 @@ start:
     ; Inicializar el juego
 
     ; Inicializar pantalla
+    call screen_inicializar
+    call imprimir_nombre_de_grupo
 
     ; Inicializar el manejador de memoria
 

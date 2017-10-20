@@ -109,8 +109,8 @@ void screen_pintar_linea_v(unsigned char c, unsigned char color, int fila, int c
 void screen_inicializar() {
 	clear_screen();
 	screen_pintar_rect(0, C_BG_LIGHT_GREY, 1, 0, 44, 80); // mapa con fondo gris
-	screen_pintar_rect(0, C_BG_RED, 44, 33, 5, 7); // barra de jugador rojo
-	screen_pintar_rect(0, C_BG_BLUE, 44, 40, 5, 7); // barra de jugador azul
+	screen_pintar_rect(0, C_BG_RED, 45, 33, 5, 7); // barra de jugador rojo
+	screen_pintar_rect(0, C_BG_BLUE, 45, 40, 5, 7); // barra de jugador azul
 }
 
 /*void screen_pintar_puntajes() {}
@@ -134,5 +134,13 @@ void clear_screen() {
 			screen_pintar(0, C_BG_BLACK, fila, columna);
 		}
 	}
+}
+
+void print_isr(){
+  print("Interrupcion ha sido atendida.", 0, 3, C_FG_LIGHT_GREY);
+}
+
+void imprimir_nombre_de_grupo(){
+    print("El crew de Ariane 5", 61, 0, C_BG_MAGENTA+C_FG_LIGHT_GREEN);
 }
 
