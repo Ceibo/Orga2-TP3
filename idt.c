@@ -19,21 +19,6 @@ idt_descriptor IDT_DESC = {
     (unsigned int) &idt
 };
 
-/*
-    La siguiente es una macro de EJEMPLO para ayudar a armar entradas de
-    interrupciones. Para usar, descomentar y completar CORRECTAMENTE los
-    atributos y el registro de segmento. Invocarla desde idt_inicializar() de
-    la siguiene manera:
-
-    void idt_inicializar() {
-        idt_entry(0);
-        ...
-        idt_entry(19);
-
-        ...
-    }
-*/
-
 #define IDT_ENTRY(numero)                                                                                        \
     idt[numero].offset_0_15 = (unsigned short) ((unsigned int)(&_isr ## numero) & (unsigned int) 0xFFFF);        \
     idt[numero].segsel = (unsigned short) 0x40;                                                                  \
@@ -43,12 +28,6 @@ idt_descriptor IDT_DESC = {
 //Mando el segmento de codigo al kernel, que era el subindice 8, que es 0x40 por que está shifteado 3 bits.
 // 1000 1110 0000 0000(o cualquier cosa en estos ultimos) Pasar esto a hexa para el atributo.
 // 0x8E00
-
-void print_isr(int i){
-    printf("Codigo de error " ,2,2,0x7);
-    //IMPRIMIR EL ERROR Y VER COMO HACERLO
-
-}
 
 void idt_inicializar() {
     IDT_ENTRY(0);

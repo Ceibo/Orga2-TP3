@@ -21,13 +21,13 @@ extern sched_tarea_actual
 ;;
 ;; Definición de MACROS
 ;; -------------------------------------------------------------------------- ;;
-extern print_idt
+extern print_isr
 
 %macro ISR 1
 global _isr%1
 
 _isr%1:
-    call print_idt
+    call print_isr
     mov eax, %1
     jmp $
 

@@ -8,3 +8,4 @@ kernel.sym
 *.tsk
 diskette.img
 /tmp/bochs.log
+snapshot.txt
