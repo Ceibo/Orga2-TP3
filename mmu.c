@@ -19,3 +19,19 @@
 
 /* Direcciones fisicas de directorios y tablas de paginas del KERNEL */
 /* -------------------------------------------------------------------------- */
+page_directory_entry* page_directory;
+
+void mmu_inicializar_dir_kernel() {
+  page_directory = 0x27000;
+  page_directory->p = 1;
+  page_directory->rw = 1;
+  page_directory->us = 0;
+  page_directory->pwt = 0;
+  page_directory->pcd = 0;
+  page_directory->a = 0;
+  page_directory->ignored = 0;
+  page_directory->ps = 0;
+  page_directory->g = 0;
+  page_directory->avl = 0;
+  page_directory->base = 0; 
+}
