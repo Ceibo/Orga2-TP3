@@ -8,6 +8,8 @@
 global start
 
 extern GDT_DESC
+extern IDT_DESC
+extern idt_inicializar
 
 ;; Saltear seccion de datos
 jmp start
@@ -99,8 +101,10 @@ start:
     ; Inicializar el scheduler
 
     ; Inicializar la IDT
-
+	call idt_inicializar
+	
     ; Cargar IDT
+    lidt [IDT_DESC]
 
     ; Configurar controlador de interrupciones
 
@@ -126,6 +130,13 @@ start:
 limpiar_pantalla:
 	; recorrer la memoria desde 0x0 hasta el límite del segmento de
 	; video (sacarlo de la GDT) e ir escribiendo cero en cada posición
+	mov ebx, 0xB8000
+	mov ecx, 4000
+	xor eax, eax
+	.ciclo:
+		mov [fs:ebx], ax
+		add ebx, 2
+	loop .ciclo	
 ret
 
 
