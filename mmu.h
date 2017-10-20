@@ -17,6 +17,7 @@
 #define MAPA_BASE_VIRTUAL 0x800000
 
 #define PAGE_DIRECTORY_SIZE 1
+#define PAGE_TABLES_COUNT 4
 
 typedef struct struct_page_directory_entry {
     unsigned char   p:1;       // Present(1)
@@ -36,8 +37,8 @@ typedef struct struct_page_directory_entry {
 void mmu_inicializar_dir_kernel();
 
 typedef struct struct_page_table_entry {
-    unsigned char   p:1;
-    unsigned char 	rw:1;
+    unsigned char p:1;
+    unsigned char rw:1;
    	unsigned char	us:1;
    	unsigned char	pwt:1;
    	unsigned char	pcd:1;
