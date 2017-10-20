@@ -8,6 +8,8 @@
 global start
 
 extern GDT_DESC
+extern IDT_DESC
+extern idt_inicializar
 
 ;; Saltear seccion de datos
 jmp start
@@ -100,8 +102,11 @@ start:
     ; Inicializar el scheduler
 
     ; Inicializar la IDT
+    call idt_inicializar
 
     ; Cargar IDT
+    lidt [IDT_DESC]
+
 
     ; Configurar controlador de interrupciones
 

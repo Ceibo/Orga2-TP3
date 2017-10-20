@@ -62,7 +62,7 @@ gdt_entry gdt[GDT_COUNT] = {
 
     // [Ejercicio 1A] Agrego los 4 segmentos arrancando desde la posición 8
  
-    // Segmento para código de nivel cero
+    // Segmento para código de nivel cero (Kerner)
     [8] = (gdt_entry) {
         (unsigned short)    SEGMENT_LIMIT_0_15,
         (unsigned short)    SEGMENT_BASE_ADDRESS_0_15,
