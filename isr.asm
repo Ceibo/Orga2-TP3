@@ -17,16 +17,17 @@ extern fin_intr_pic1
 ;; Sched
 extern sched_tick
 extern sched_tarea_actual
-extern print_idt
 
 ;;
 ;; Definición de MACROS
 ;; -------------------------------------------------------------------------- ;;
+extern print_idt
 
 %macro ISR 1
 global _isr%1
 
 _isr%1:
+    call print_idt
     mov eax, %1
     jmp $
 
@@ -60,9 +61,6 @@ ISR 16
 ISR 17
 ISR 18
 ISR 19
-
-
-
 
 ;;
 ;; Rutina de atención del RELOJ
