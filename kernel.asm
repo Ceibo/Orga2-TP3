@@ -95,8 +95,15 @@ start:
     ; Inicializar el directorio de paginas
 
     ; Cargar directorio de paginas
+    mov eax, page_directory
+    mov cr3, eax
 
-    ; Habilitar paginacion
+    ; Habilitar paginacion (O sea, poner en 1 el bit 31 de CR0)
+
+
+    mov eax, cr0
+    or eax, 0x80000000
+    mov cr0, eax
 
     ; Inicializar tss
 
@@ -142,6 +149,6 @@ limpiar_pantalla:
 		add ebx, 2
 	loop .ciclo	
 ret
-
+dd
 
 
