@@ -12,6 +12,8 @@ extern IDT_DESC
 extern idt_inicializar
 extern screen_inicializar
 extern imprimir_nombre_de_grupo
+extern page_directory
+extern mmu_inicializar_dir_kernel
 
 ;; Saltear seccion de datos
 jmp start
@@ -93,14 +95,13 @@ start:
     ; Inicializar el manejador de memoria
 
     ; Inicializar el directorio de paginas
+    call mmu_inicializar_dir_kernel
 
     ; Cargar directorio de paginas
     mov eax, page_directory
     mov cr3, eax
 
-    ; Habilitar paginacion (O sea, poner en 1 el bit 31 de CR0)
-
-
+    ; Habilitar paginacion
     mov eax, cr0
     or eax, 0x80000000
     mov cr0, eax
