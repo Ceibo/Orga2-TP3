@@ -1,4 +1,4 @@
-/* ** por compatibilidad se omiten tildes **
+ /* ** por compatibilidad se omiten tildes **
 ================================================================================
  TRABAJO PRACTICO 3 - System Programming - ORGANIZACION DE COMPUTADOR II - FCEN
 ================================================================================
@@ -64,14 +64,14 @@ gdt_entry gdt[GDT_COUNT] = {
  
     // Segmento para código de nivel cero (Kerner)
     [8] = (gdt_entry) {
-        (unsigned short)    SEGMENT_LIMIT_0_15,
+        (unsigned short)    0xcfff,
         (unsigned short)    SEGMENT_BASE_ADDRESS_0_15,
         (unsigned char)     SEGMENT_BASE_ADDRESS_23_16,
         (unsigned char)     SEGMENT_TYPE___CODE_READ_EXECUTE,
         (unsigned char)     DESCRIPTOR_TYPE___CODE_OR_DATA,
         (unsigned char)     DESCRIPTOR_PRIVILEGE_LEVEL___ZERO,
         (unsigned char)     SEGMENT_PRESENT___YES,
-        (unsigned char)     SEGMENT_LIMIT_19_16,
+        (unsigned char)     0x7,// hexa mAs significativo de lImite tal que lImite es 0x7cfff,
         (unsigned char)     AVAILABLE_FOR_USE_BY_SYSTEM_SOFTWARE,
         (unsigned char)     CODE_SEGMENT_64_BIT,
         (unsigned char)     DEFAULT_OPERATION_SIZE___32_BITS,
@@ -81,14 +81,14 @@ gdt_entry gdt[GDT_COUNT] = {
     
     // Segmento para datos de nivel cero
     [9] = (gdt_entry) {
-        (unsigned short)    SEGMENT_LIMIT_0_15,
+        (unsigned short)    0xcfff,
         (unsigned short)    SEGMENT_BASE_ADDRESS_0_15,
         (unsigned char)     SEGMENT_BASE_ADDRESS_23_16,
         (unsigned char)     SEGMENT_TYPE___DATA_READ_WRITE,
         (unsigned char)     DESCRIPTOR_TYPE___CODE_OR_DATA,
         (unsigned char)     DESCRIPTOR_PRIVILEGE_LEVEL___ZERO,
         (unsigned char)     SEGMENT_PRESENT___YES,
-        (unsigned char)     SEGMENT_LIMIT_19_16,
+        (unsigned char)     0x7,// hexa mAs significativo de lImite tal que lImite es 0x7cfff,,
         (unsigned char)     AVAILABLE_FOR_USE_BY_SYSTEM_SOFTWARE,
         (unsigned char)     CODE_SEGMENT_64_BIT,
         (unsigned char)     DEFAULT_OPERATION_SIZE___32_BITS,
@@ -98,14 +98,14 @@ gdt_entry gdt[GDT_COUNT] = {
 
 	// Segmento para código de nivel tres
     [10] = (gdt_entry) {
-        (unsigned short)    SEGMENT_LIMIT_0_15,
+        (unsigned short)    0xcfff,
         (unsigned short)    SEGMENT_BASE_ADDRESS_0_15,
         (unsigned char)     SEGMENT_BASE_ADDRESS_23_16,
         (unsigned char)     SEGMENT_TYPE___CODE_READ_EXECUTE,
         (unsigned char)     DESCRIPTOR_TYPE___CODE_OR_DATA,
         (unsigned char)     DESCRIPTOR_PRIVILEGE_LEVEL___THREE,
         (unsigned char)     SEGMENT_PRESENT___YES,
-        (unsigned char)     SEGMENT_LIMIT_19_16,
+        (unsigned char)     0x7,// hexa mAs significativo de lImite tal que lImite es 0x7cfff,
         (unsigned char)     AVAILABLE_FOR_USE_BY_SYSTEM_SOFTWARE,
         (unsigned char)     CODE_SEGMENT_64_BIT,
         (unsigned char)     DEFAULT_OPERATION_SIZE___32_BITS,
@@ -115,14 +115,14 @@ gdt_entry gdt[GDT_COUNT] = {
 
 	// Segmento para datos de nivel tres
     [11] = (gdt_entry) {
-        (unsigned short)    SEGMENT_LIMIT_0_15,
+        (unsigned short)    0xcfff,
         (unsigned short)    SEGMENT_BASE_ADDRESS_0_15,
         (unsigned char)     SEGMENT_BASE_ADDRESS_23_16,
         (unsigned char)     SEGMENT_TYPE___DATA_READ_WRITE,
         (unsigned char)     DESCRIPTOR_TYPE___CODE_OR_DATA,
         (unsigned char)     DESCRIPTOR_PRIVILEGE_LEVEL___THREE,
         (unsigned char)     SEGMENT_PRESENT___YES,
-        (unsigned char)     SEGMENT_LIMIT_19_16,
+        (unsigned char)     0x7,// hexa mAs significativo de lImite tal que lImite es 0x7cfff,,
         (unsigned char)     AVAILABLE_FOR_USE_BY_SYSTEM_SOFTWARE,
         (unsigned char)     CODE_SEGMENT_64_BIT,
         (unsigned char)     DEFAULT_OPERATION_SIZE___32_BITS,
@@ -132,12 +132,12 @@ gdt_entry gdt[GDT_COUNT] = {
     
     // Segmento para la pantalla utilizado solo por el kernel
     [12] = (gdt_entry) {
-        (unsigned short)    0x1F40, // segment limit 0-15
+        (unsigned short)    0x1f3f, // segment limit 0-15
         (unsigned short)    0x8000, // base address 0-15
         (unsigned char)     0x0B, // base address 16-23
         (unsigned char)     SEGMENT_TYPE___DATA_READ_WRITE,
         (unsigned char)     DESCRIPTOR_TYPE___CODE_OR_DATA,
-        (unsigned char)     DESCRIPTOR_PRIVILEGE_LEVEL___THREE,
+        (unsigned char)     0x0,//(00)b: nivel 0 ,
         (unsigned char)     SEGMENT_PRESENT___YES,
         (unsigned char)     0x00, // segment limit 16-19
         (unsigned char)     AVAILABLE_FOR_USE_BY_SYSTEM_SOFTWARE,
