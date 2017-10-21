@@ -18,6 +18,7 @@
 
 #define PAGE_DIRECTORY_SIZE 1
 #define PAGE_TABLES_COUNT 4
+#define TABLE_SIZE 1024
 
 typedef struct struct_page_directory_entry {
     unsigned char   p:1;       // Present(1)
