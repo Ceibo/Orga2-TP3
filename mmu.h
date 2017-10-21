@@ -51,10 +51,4 @@ typedef struct struct_page_table_entry {
    	unsigned int	base:19;
 } __attribute__((__packed__, aligned (4))) page_table_entry;
 
-
-
-extern page_table_entry*;
-extern page_table;	
-
-
 #endif	/* !__MMU_H__ */
