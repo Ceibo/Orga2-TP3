@@ -83,7 +83,6 @@ void print_dec(uint numero, int size, uint x, uint y, unsigned short attr) {
 }
 
 void screen_pintar_rect(unsigned char c, unsigned char color, int fila, int columna, int alto, int ancho) {
-	//color = C_MAKE_BG(color);
 	uint i, j;
 	for (i = fila; i < fila + alto; i++) {
 		for (j = columna; j < columna + ancho; j++) {
@@ -93,21 +92,18 @@ void screen_pintar_rect(unsigned char c, unsigned char color, int fila, int colu
 }
 
 void screen_pintar_linea_h(unsigned char c, unsigned char color, int fila, int columna, int ancho) {
-	//color = C_MAKE_BG(color);
 	while (ancho-- > 0) {
 		screen_pintar(c, color, fila, columna++);
 	}
 }
 
 void screen_pintar_linea_v(unsigned char c, unsigned char color, int fila, int columna, int alto) {
-	//color = C_MAKE_BG(color);
 	while (alto-- > 0) {
 		screen_pintar(c, color, fila++, columna);
 	}
 }
 
 void screen_inicializar() {
-	clear_screen();
 	screen_pintar_rect(0, C_BG_LIGHT_GREY, 1, 0, 44, 80); // mapa con fondo gris
 	screen_pintar_rect(0, C_BG_RED, 45, 33, 5, 7); // barra de jugador rojo
 	screen_pintar_rect(0, C_BG_BLUE, 45, 40, 5, 7); // barra de jugador azul

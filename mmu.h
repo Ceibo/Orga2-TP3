@@ -16,9 +16,10 @@
 #define MAPA_BASE_FISICA  0x500000
 #define MAPA_BASE_VIRTUAL 0x800000
 
-#define PAGE_DIRECTORY_SIZE 1
-#define PAGE_TABLES_COUNT 4
-#define TABLE_SIZE 1024
+#define PAGE_DIRECTORIES_COUNT 1024
+#define PAGE_TABLES_COUNT 1024
+#define PAGE_DIRECTORY_ADDRESS 0x27000
+#define PAGE_TABLE_ADDRESS 0x28000
 
 typedef struct struct_page_directory_entry {
     unsigned char   p:1;       // Present(1)
@@ -48,7 +49,7 @@ typedef struct struct_page_table_entry {
    	unsigned char	pat:1;
    	unsigned char	g:1;
    	unsigned char	avl:3;
-   	unsigned int	base:19;
+   	unsigned int	base:20;
 } __attribute__((__packed__, aligned (4))) page_table_entry;
 
 #endif	/* !__MMU_H__ */

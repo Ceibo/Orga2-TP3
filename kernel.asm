@@ -12,8 +12,10 @@ extern IDT_DESC
 extern idt_inicializar
 extern screen_inicializar
 extern imprimir_nombre_de_grupo
-extern page_directory
 extern mmu_inicializar_dir_kernel
+
+%define PAGE_TABLE_ADDRESS 0x28000
+%define PAGE_DIRECTORY_ADDRESS 0x27000
 
 ;; Saltear seccion de datos
 jmp start
@@ -89,6 +91,9 @@ start:
     ; Inicializar el juego
 
     ; Inicializar pantalla
+    extern clear_screen
+    call clear_screen
+    ;call limpiar_pantalla
     call screen_inicializar
     call imprimir_nombre_de_grupo
 
@@ -98,13 +103,14 @@ start:
     call mmu_inicializar_dir_kernel
 
     ; Cargar directorio de paginas
-    mov eax, page_directory
+    mov eax, PAGE_DIRECTORY_ADDRESS
     mov cr3, eax
 
     ; Habilitar paginacion
     mov eax, cr0
     or eax, 0x80000000
     mov cr0, eax
+    ;call identity_mapping
 
     ; Inicializar tss
 
@@ -150,6 +156,21 @@ limpiar_pantalla:
 		add ebx, 2
 	loop .ciclo	
 ret
-dd
 
-
+identity_mapping:
+    mov ecx, 1024
+    mov ebx, PAGE_DIRECTORY_ADDRESS
+    mov dword [PAGE_DIRECTORY_ADDRESS], PAGE_TABLE_ADDRESS+0x3
+    mov ecx, 1024
+    mov ebx, PAGE_TABLE_ADDRESS
+    mov edx, 0x1000 * 1023
+    .pd:
+        mov dword [ebx+ecx*4-4], 0x00000002
+    loop .pd
+    .pt:
+        mov [ebx+ecx*4-4], edx
+        add dword [ebx+ecx*4-4], 0x00000003
+        sub edx, 0x1000
+    loop .pt
+    mov dword [PAGE_TABLE_ADDRESS+512*4], 0x000B8003
+ret
