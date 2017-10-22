@@ -93,7 +93,9 @@ start:
     ; Inicializar pantalla
     extern clear_screen
     call clear_screen
-    ;call limpiar_pantalla
+    
+    call limpiar_pantalla
+	
     call screen_inicializar
     call imprimir_nombre_de_grupo
 
@@ -145,10 +147,12 @@ start:
 
 %include "a20.asm"
 
+;global limpiar_pantalla
+BITS 32
 limpiar_pantalla:
 	; recorrer la memoria desde 0x0 hasta el límite del segmento de
 	; video (sacarlo de la GDT) e ir escribiendo cero en cada posición
-	mov ebx, 0xB8000
+	mov ebx, 0x000
 	mov ecx, 4000
 	xor eax, eax
 	.ciclo:
