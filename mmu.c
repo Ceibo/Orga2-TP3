@@ -45,7 +45,7 @@ void mmu_inicializar_dir_kernel() {
   }
   page_directory[0].p = 1;
   page_directory[0].rw = 1;
-  page_directory[0].base = ((int) page_table_0) >> 12;
+  page_directory[0].base = PAGE_TABLE_ADDRESS >> 12;
 
   page_table_entry pte;
   pte.p = 1;

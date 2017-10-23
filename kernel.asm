@@ -79,7 +79,7 @@ start:
 	mov gs, ax
 
 	mov ax, 0x60 ; carga segmento de video
-	mov fs, ax ; mov es, ax ???
+	mov fs, ax
 	
     ; Establecer la base de la pila
 	mov esp, 0x27000
@@ -90,12 +90,8 @@ start:
 
     ; Inicializar el juego
 
-    ; Inicializar pantalla
-    extern clear_screen
-    call clear_screen
-    
+    ; Inicializar pantalla  
     call limpiar_pantalla
-	
     call screen_inicializar
     call imprimir_nombre_de_grupo
 
@@ -147,17 +143,17 @@ start:
 
 %include "a20.asm"
 
-;global limpiar_pantalla
 BITS 32
 limpiar_pantalla:
 	; recorrer la memoria desde 0x0 hasta el límite del segmento de
 	; video (sacarlo de la GDT) e ir escribiendo cero en cada posición
-	mov ebx, 0x000
-	mov ecx, 4000
+	xor ebx, ebx
+	mov ecx, 2000 ; debería ser 4000 pero procesamos de a dos celdas
 	xor eax, eax
+    mov eax, 0x0
 	.ciclo:
-		mov [fs:ebx], ax
-		add ebx, 2
+		mov [fs:ebx], eax
+		add ebx, 4
 	loop .ciclo	
 ret
 
