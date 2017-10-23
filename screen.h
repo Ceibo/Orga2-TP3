@@ -57,7 +57,7 @@ void screen_stop_game_show_winner(jugador_t *j);
 
 void clear_screen();
 
-void print_isr();
+void print_isr(int i);
 void imprimir_nombre_de_grupo();
 
 #endif  /* !__SCREEN_H__ */

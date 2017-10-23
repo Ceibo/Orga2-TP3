@@ -132,9 +132,70 @@ void clear_screen() {
 	}
 }
 
-void print_isr(){
-  print("Interrupcion ha sido atendida.", 0, 3, C_FG_LIGHT_GREY);
+void print_isr(int i){
+
+if(i == 0)
+	print("Interrupcion 0 ocurrida: Divide Error.", 0, 3, C_FG_LIGHT_GREY);
+	
+if(i == 1)
+	print("Interrupcion 1 ocurrida: Debug Exception.", 0, 3, C_FG_LIGHT_GREY);
+	
+if(i == 2)
+	print("Interrupcion 2 ocurrida: NMI Interrupt.", 0, 3, C_FG_LIGHT_GREY);
+	
+if(i == 3)
+	print("Interrupcion 3 ocurrida: Breakpoint.", 0, 3, C_FG_LIGHT_GREY);
+	
+if(i == 4)
+	print("Interrupcion 4 ocurrida: Overflow.", 0, 3, C_FG_LIGHT_GREY);
+	
+if(i == 5)
+	print("Interrupcion 5 ocurrida: BOUND Range Exceeded.", 0, 3, C_FG_LIGHT_GREY);
+	
+if(i == 6)
+	print("Interrupcion 6 ocurrida: Invalid Opcode (Undefined Opcode).", 0, 3, C_FG_LIGHT_GREY);
+	
+if(i == 7)
+	print("Interrupcion 7 ocurrida: Device Not Available (No Math Coprocesor).", 0, 3, C_FG_LIGHT_GREY);
+
+if(i == 8)
+	print("Interrupcion 8 ocurrida: Double Fault.", 0, 3, C_FG_LIGHT_GREY);
+	
+if(i == 9)
+	print("Interrupcion 9 ocurrida: Coprocessor Segment Overrun.", 0, 3, C_FG_LIGHT_GREY);
+	
+if(i == 10)
+	print("Interrupcion 10 ocurrida: Invalid TSS.", 0, 3, C_FG_LIGHT_GREY);
+	
+if(i == 11)
+	print("Interrupcion 11 ocurrida: Segment Not Present.", 0, 3, C_FG_LIGHT_GREY);
+	
+if(i == 12)
+	print("Interrupcion 12 ocurrida: Stack-Segment Fault.", 0, 3, C_FG_LIGHT_GREY);
+	
+if(i == 13)
+    print("Interrupcion 13 ocurrida: General Protection.", 0, 3, C_FG_LIGHT_GREY);
+    
+if(i == 14)
+	print("Interrupcion 14 ocurrida: Page Fault.", 0, 3, C_FG_LIGHT_GREY);
+	
+if(i == 15)
+	print("Interrupcion 15 ocurrida", 0, 3, C_FG_LIGHT_GREY);
+	
+if(i == 16)
+	print("Interrupcion 16 ocurrida: x87 FPU Floating-Point Error (Math Fault)", 0, 3, C_FG_LIGHT_GREY);
+
+if(i == 17)
+	print("Interrupcion 17 ocurrida: Alignment Check.", 0, 3, C_FG_LIGHT_GREY);
+	
+if(i == 18)
+	print("Interrupcion 18 ocurrida: Machine Check.", 0, 3, C_FG_LIGHT_GREY);
+	
+if(i == 19)
+	print("Interrupcion 19 ocurrida: SIMD Floating-Point Exception.", 0, 3, C_FG_LIGHT_GREY);
+ 
 }
+
 
 void imprimir_nombre_de_grupo(){
     print("El crew de Ariane 5", 61, 0, C_BG_MAGENTA+C_FG_LIGHT_GREEN);

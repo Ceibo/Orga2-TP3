@@ -148,14 +148,15 @@ limpiar_pantalla:
 	; recorrer la memoria desde 0x0 hasta el límite del segmento de
 	; video (sacarlo de la GDT) e ir escribiendo cero en cada posición
 	xor ebx, ebx
-	mov ecx, 2000 ; debería ser 4000 pero procesamos de a dos celdas
-	xor eax, eax
-    mov eax, 0x0
+	mov ecx, 4000  
 	.ciclo:
-		mov [fs:ebx], eax
-		add ebx, 4
+		mov byte [fs:ebx], 219; 219: caracter ascii de celda completa
+		inc ebx
+		mov byte [fs:ebx], 0; color negro
+        inc ebx
 	loop .ciclo	
 ret
+
 
 identity_mapping:
     mov ecx, 1024

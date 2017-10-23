@@ -27,7 +27,11 @@ extern print_isr
 global _isr%1
 
 _isr%1:
+	 
+	push %1
     call print_isr
+    add esp,4
+    
     mov eax, %1
     jmp $
 
