@@ -11,16 +11,16 @@
 
 /* Struct de descriptor de IDT */
 typedef struct str_idt_descriptor {
-    unsigned short  idt_length;
-    unsigned int    idt_addr;
+    uint16_t idt_length;
+    uint32_t idt_addr;
 } __attribute__((__packed__)) idt_descriptor;
 
 /* Struct de una entrada de la IDT */
 typedef struct str_idt_entry_fld {
-    unsigned short offset_0_15;
-    unsigned short segsel;
-    unsigned short attr;
-    unsigned short offset_16_31;
+    uint16_t offset_0_15;
+    uint16_t segsel;
+    uint16_t attr;
+    uint16_t offset_16_31;
 } __attribute__((__packed__, aligned (8))) idt_entry;
 
 extern idt_entry idt[];

@@ -16,9 +16,10 @@
 #define FALSE                   0x00000000
 #define ERROR                   1
 
-typedef unsigned char  uchar;
-typedef unsigned short ushort;
-typedef unsigned int   uint;
+typedef unsigned int uint32_t;
+typedef unsigned short uint16_t;
+typedef unsigned char uint8_t;
+typedef int int32_t;
 
 /* Constantes basicas */
 /* -------------------------------------------------------------------------- */

@@ -20,26 +20,26 @@ const char reloj[] = "|/-\\";
 
 void screen_actualizar_reloj_global()
 {
-    static uint reloj_global = 0;
+    static uint32_t reloj_global = 0;
 
     reloj_global = (reloj_global + 1) % reloj_size;
 
     screen_pintar(reloj[reloj_global], C_BW, 49, 79);
 }
 
-void screen_pintar(uchar c, uchar color, uint fila, uint columna)
+void screen_pintar(uint8_t c, uint8_t color, uint32_t fila, uint32_t columna)
 {
     p[fila][columna].c = c;
     p[fila][columna].a = color;
 }
 
-uchar screen_valor_actual(uint fila, uint columna)
+uint8_t screen_valor_actual(uint32_t fila, uint32_t columna)
 {
     return p[fila][columna].c;
 }
 
-void print(const char * text, uint x, uint y, unsigned short attr) {
-    int i;
+void print(const char * text, uint32_t x, uint32_t y, uint16_t attr) {
+    int32_t i;
     for (i = 0; text[i] != 0; i++)
      {
         screen_pintar(text[i], attr, y, x);
@@ -52,8 +52,8 @@ void print(const char * text, uint x, uint y, unsigned short attr) {
     }
 }
 
-void print_hex(uint numero, int size, uint x, uint y, unsigned short attr) {
-    int i;
+void print_hex(uint32_t numero, int32_t size, uint32_t x, uint32_t y, uint16_t attr) {
+    int32_t i;
     char hexa[8];
     char letras[16] = "0123456789ABCDEF";
     hexa[0] = letras[ ( numero & 0x0000000F ) >> 0  ];
@@ -70,20 +70,20 @@ void print_hex(uint numero, int size, uint x, uint y, unsigned short attr) {
     }
 }
 
-void print_dec(uint numero, int size, uint x, uint y, unsigned short attr) {
-    int i;
+void print_dec(uint32_t numero, int32_t size, uint32_t x, uint32_t y, uint16_t attr) {
+    int32_t i;
     char letras[16] = "0123456789";
 
     for(i = 0; i < size; i++) {
-        int resto  = numero % 10;
+        int32_t resto  = numero % 10;
         numero = numero / 10;
         p[y][x + size - i - 1].c = letras[resto];
         p[y][x + size - i - 1].a = attr;
     }
 }
 
-void screen_pintar_rect(unsigned char c, unsigned char color, int fila, int columna, int alto, int ancho) {
-	uint i, j;
+void screen_pintar_rect(uint8_t c, uint8_t color, int32_t fila, int32_t columna, int32_t alto, int32_t ancho) {
+	uint32_t i, j;
 	for (i = fila; i < fila + alto; i++) {
 		for (j = columna; j < columna + ancho; j++) {
 			screen_pintar(c, color, i, j);
@@ -91,13 +91,13 @@ void screen_pintar_rect(unsigned char c, unsigned char color, int fila, int colu
 	}
 }
 
-void screen_pintar_linea_h(unsigned char c, unsigned char color, int fila, int columna, int ancho) {
+void screen_pintar_linea_h(uint8_t c, uint8_t color, int32_t fila, int32_t columna, int32_t ancho) {
 	while (ancho-- > 0) {
 		screen_pintar(c, color, fila, columna++);
 	}
 }
 
-void screen_pintar_linea_v(unsigned char c, unsigned char color, int fila, int columna, int alto) {
+void screen_pintar_linea_v(uint8_t c, uint8_t color, int32_t fila, int32_t columna, int32_t alto) {
 	while (alto-- > 0) {
 		screen_pintar(c, color, fila++, columna);
 	}
@@ -111,20 +111,20 @@ void screen_inicializar() {
 
 /*void screen_pintar_puntajes() {}
 void screen_actualizar_reloj_pirata (jugador_t *j, pirata_t *pirata) {}
-unsigned char screen_color_jugador(jugador_t *j) {}
-unsigned char screen_caracter_pirata(unsigned int tipo) {}
+uint8_t screen_color_jugador(jugador_t *j) {}
+uint8_t screen_caracter_pirata(unsigned int32_t tipo) {}
 void screen_pintar_pirata(jugador_t *j, pirata_t *pirata) {}
 void screen_borrar_pirata(jugador_t *j, pirata_t *pirata) {}
 void screen_pintar_reloj_pirata(jugador_t *j, pirata_t *pirata) {}
 void screen_pintar_reloj_piratas(jugador_t *j) {}
 void screen_pintar_relojes() {}
-void screen_actualizar_posicion_mapa(uint x, uint y) {}
+void screen_actualizar_posicion_mapa(uint32_t x, uint32_t y) {}
 void screen_stop_game_show_winner(jugador_t *j) {}
-int ee_printf(const char *fmt, ...) {}*/
+int32_t ee_printf(const char *fmt, ...) {}*/
 
 // Escribe el caracter nulo en todas las celdas de la pantalla y pone fondo negro
 void clear_screen() {
-	uint fila, columna;
+	uint32_t fila, columna;
 	for (fila = 0; fila < VIDEO_FILS; fila++) {
 		for (columna = 0; columna < VIDEO_COLS; columna++) {
 			screen_pintar(0, C_BG_BLACK, fila, columna);
@@ -132,7 +132,7 @@ void clear_screen() {
 	}
 }
 
-void print_isr(int i){
+void print_isr(int32_t i){
 
 if(i == 0)
 	print("Interrupcion 0 ocurrida: Divide Error.", 0, 3, C_FG_LIGHT_GREY);

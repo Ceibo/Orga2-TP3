@@ -19,8 +19,8 @@
 #include "defines.h"
 /* Estructura de para acceder a memoria de video */
 typedef struct ca_s {
-    unsigned char c;
-    unsigned char a;
+    uint8_t  c;
+    uint8_t  a;
 } ca;
 
 
@@ -30,34 +30,34 @@ typedef struct pirata_t pirata_t;
 struct jugador_t;
 typedef struct jugador_t jugador_t;
 
-int ee_printf(const char *fmt, ...);
+int32_t ee_printf(const char *fmt, ...);
 
 
-void screen_pintar(unsigned char c, unsigned char color, uint fila, uint columna);
-void print(const char * text, unsigned int x, unsigned int y, unsigned short attr);
-void print_hex(unsigned int numero, int size, unsigned int x, unsigned int y, unsigned short attr);
-void screen_pintar_rect(unsigned char c, unsigned char color, int fila, int columna, int alto, int ancho);
-void screen_pintar_linea_h(unsigned char c, unsigned char color, int fila, int columna, int ancho);
-void screen_pintar_linea_v(unsigned char c, unsigned char color, int fila, int columna, int alto);
+void screen_pintar(uint8_t  c, uint8_t  color, uint32_t fila, uint32_t columna);
+void print(const char * text, uint32_t x, uint32_t y, uint16_t attr);
+void print_hex(uint32_t numero, int32_t size, uint32_t x, uint32_t y, uint16_t attr);
+void screen_pintar_rect(uint8_t  c, uint8_t  color, int32_t fila, int32_t columna, int32_t alto, int32_t ancho);
+void screen_pintar_linea_h(uint8_t  c, uint8_t  color, int32_t fila, int32_t columna, int32_t ancho);
+void screen_pintar_linea_v(uint8_t  c, uint8_t  color, int32_t fila, int32_t columna, int32_t alto);
 void screen_inicializar();
 void screen_pintar_puntajes();
 
 void screen_actualizar_reloj_global();
 void screen_actualizar_reloj_pirata (jugador_t *j, pirata_t *pirata);
-unsigned char screen_color_jugador(jugador_t *j);
-unsigned char screen_caracter_pirata(unsigned int tipo);
+uint8_t  screen_color_jugador(jugador_t *j);
+uint8_t  screen_caracter_pirata(uint32_t tipo);
 void screen_pintar_pirata(jugador_t *j, pirata_t *pirata);
 void screen_borrar_pirata(jugador_t *j, pirata_t *pirata);
 void screen_pintar_reloj_pirata(jugador_t *j, pirata_t *pirata);
 void screen_pintar_reloj_piratas(jugador_t *j);
 void screen_pintar_relojes();
 
-void screen_actualizar_posicion_mapa(uint x, uint y);
+void screen_actualizar_posicion_mapa(uint32_t x, uint32_t y);
 void screen_stop_game_show_winner(jugador_t *j);
 
 void clear_screen();
 
-void print_isr(int i);
+void print_isr(int32_t i);
 void imprimir_nombre_de_grupo();
 
 #endif  /* !__SCREEN_H__ */

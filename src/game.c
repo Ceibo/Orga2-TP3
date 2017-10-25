@@ -22,7 +22,7 @@ TRABAJO PRACTICO 3 - System Programming - ORGANIZACION DE COMPUTADOR II - FCEN
 
 #define BOTINES_CANTIDAD 8
 
-uint botines[BOTINES_CANTIDAD][3] = { // TRIPLAS DE LA FORMA (X, Y, MONEDAS)
+uint32_t  botines[BOTINES_CANTIDAD][3] = { // TRIPLAS DE LA FORMA (X, Y, MONEDAS)
                                         {30,  3, 50}, {31, 38, 50}, {15, 21, 100}, {45, 21, 100} ,
                                         {49,  3, 50}, {48, 38, 50}, {64, 21, 100}, {34, 21, 100}
                                     };
@@ -37,21 +37,21 @@ void* error()
 	return 0;
 }
 
-uint game_xy2lineal (uint x, uint y) {
+uint32_t  game_xy2lineal (uint32_t  x, uint32_t  y) {
 	return (y * MAPA_ANCHO + x);
 }
 
-uint game_posicion_valida(int x, int y) {
+uint32_t  game_posicion_valida(int x, int y) {
 	return (x >= 0 && y >= 0 && x < MAPA_ANCHO && y < MAPA_ALTO);
 }
 
-pirata_t* id_pirata2pirata(uint id_pirata)
+pirata_t* id_pirata2pirata(uint32_t  id_pirata)
 {
     // ~ completar ~
 	return NULL;
 }
 
-uint game_dir2xy(direccion dir, int *x, int *y)
+uint32_t  game_dir2xy(direccion dir, int *x, int *y)
 {
 	switch (dir)
 	{
@@ -65,7 +65,7 @@ uint game_dir2xy(direccion dir, int *x, int *y)
 	return 0;
 }
 
-uint game_valor_tesoro(uint x, uint y)
+uint32_t  game_valor_tesoro(uint32_t  x, uint32_t  y)
 {
 	int i;
 	for (i = 0; i < BOTINES_CANTIDAD; i++)
@@ -110,20 +110,20 @@ void game_jugador_inicializar(jugador_t *j)
 
 }
 
-void game_pirata_inicializar(pirata_t *pirata, jugador_t *j, uint index, uint id)
+void game_pirata_inicializar(pirata_t *pirata, jugador_t *j, uint32_t  index, uint32_t  id)
 {
 }
 
-void game_tick(uint id_pirata)
+void game_tick(uint32_t  id_pirata)
 {
 }
 
 
-void game_pirata_relanzar(pirata_t *pirata, jugador_t *j, uint tipo)
+void game_pirata_relanzar(pirata_t *pirata, jugador_t *j, uint32_t  tipo)
 {
 }
 
-pirata_t* game_jugador_erigir_pirata(jugador_t *j, uint tipo)
+pirata_t* game_jugador_erigir_pirata(jugador_t *j, uint32_t  tipo)
 {
     // ~ completar ~
 
@@ -131,7 +131,7 @@ pirata_t* game_jugador_erigir_pirata(jugador_t *j, uint tipo)
 }
 
 
-void game_jugador_lanzar_pirata(jugador_t *j, uint tipo, int x, int y)
+void game_jugador_lanzar_pirata(jugador_t *j, uint32_t  tipo, int x, int y)
 {
 }
 
@@ -145,36 +145,36 @@ void game_explorar_posicion(jugador_t *jugador, int c, int f)
 }
 
 
-uint game_syscall_pirata_mover(uint id, direccion dir)
+uint32_t  game_syscall_pirata_mover(uint32_t  id, direccion dir)
 {
     // ~ completar
     return 0;
 }
 
-uint game_syscall_cavar(uint id)
+uint32_t  game_syscall_cavar(uint32_t  id)
 {
     // ~ completar ~
 
 	return 0;
 }
 
-uint game_syscall_pirata_posicion(uint id, int idx)
+uint32_t  game_syscall_pirata_posicion(uint32_t  id, int idx)
 {
     // ~ completar ~
     return 0;
 }
 
-uint game_syscall_manejar(uint syscall, uint param1)
+uint32_t  game_syscall_manejar(uint32_t  syscall, uint32_t  param1)
 {
     // ~ completar ~
     return 0;
 }
 
-void game_pirata_exploto(uint id)
+void game_pirata_exploto(uint32_t  id)
 {
 }
 
-pirata_t* game_pirata_en_posicion(uint x, uint y)
+pirata_t* game_pirata_en_posicion(uint32_t  x, uint32_t  y)
 {
 	return NULL;
 }
@@ -205,6 +205,6 @@ void game_terminar_si_es_hora()
 #define KB_shiftR   0x36 // 0xb6
 
 
-void game_atender_teclado(unsigned char tecla)
+void game_atender_teclado(uint8_t tecla)
 {
 }
