@@ -65,9 +65,12 @@ void mmu_inicializar_dir_kernel();
 void mmu_inicializar_dir_pirata();
 void* mmu_direccion_fisica_de_la_proxima_pagina_libre();
 void mmu_inicializar();
+void mmu_mapear_pagina(unsigned int direccion_virtual, unsigned int direccion_fisica, page_directory_entry* directorio_de_paginas);
+void mmu_desmapear_pagina(unsigned int direccion_virtual, page_directory_entry* directorio_de_paginas);
 
-// Funciones auxiliares creadas por nosotros
-
-void build_empty_page_directory(page_directory_entry* address);
+unsigned int desplazamiento_para_funcion_de_mapeo(unsigned int direccion_virtual, unsigned int direccion_fisica);
+page_table_entry crear_entrada_nula_de_tabla_de_paginas();
+void llenar_tabla_de_paginas(page_table_entry* tabla, page_table_entry entrada, unsigned int desplazamiento);
+void llenar_directorio_de_paginas(page_directory_entry* directorio, page_table_entry* primera_tabla);
 
 #endif	/* !__MMU_H__ */
