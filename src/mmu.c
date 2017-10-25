@@ -147,4 +147,6 @@ void mmu_desmapear_pagina(unsigned int direccion_virtual,
 
   page_table_entry* tabla = (page_table_entry*) (directorio_de_paginas[nro_tabla].base << 12);
   tabla[nro_pagina].p = 0;
+  
+  tlbflush();
 }
