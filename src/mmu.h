@@ -71,6 +71,6 @@ void mmu_desmapear_pagina(unsigned int direccion_virtual, page_directory_entry* 
 unsigned int desplazamiento_para_funcion_de_mapeo(unsigned int direccion_virtual, unsigned int direccion_fisica);
 page_table_entry crear_entrada_nula_de_tabla_de_paginas();
 void llenar_tabla_de_paginas(page_table_entry* tabla, page_table_entry entrada, unsigned int desplazamiento);
-void llenar_directorio_de_paginas(page_directory_entry* directorio, page_table_entry* primera_tabla);
+void llenar_directorio_de_paginas_de_kernel(page_directory_entry* directorio, page_table_entry* tabla);
 
 #endif	/* !__MMU_H__ */

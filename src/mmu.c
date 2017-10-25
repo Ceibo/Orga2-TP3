@@ -27,27 +27,31 @@ void mmu_inicializar_dir_kernel() {
   page_directory_kernel = (page_directory_entry*) KERNEL_PAGE_DIRECTORY_ADDRESS;
   page_table_kernel_0 = (page_table_entry*) KERNEL_PAGE_TABLE_ADDRESS_0;
 
-  llenar_directorio_de_paginas(page_directory_kernel, page_table_kernel_0);
-
-  page_table_entry pte = crear_entrada_nula_de_tabla_de_paginas();
-  pte.p = 1;
-  pte.rw = 1;
-  llenar_tabla_de_paginas(page_table_kernel_0, pte, 0);
+  llenar_directorio_de_paginas_de_kernel(page_directory_kernel, page_table_kernel_0);
 }
 
 void mmu_inicializar_dir_pirata() {
   page_directory_pirate = (page_directory_entry*) mmu_direccion_fisica_de_la_proxima_pagina_libre();
-  page_table_pirate = (page_table_entry*) mmu_direccion_fisica_de_la_proxima_pagina_libre();
 
-  llenar_directorio_de_paginas(page_directory_pirate, page_table_pirate);
-
-  page_table_entry pte = crear_entrada_nula_de_tabla_de_paginas();
-  pte.p = 1;
-  pte.rw = 1;
-  unsigned int desplazamiento = desplazamiento_para_funcion_de_mapeo(0x400000, 0x500000);
+  // En todos los directorios se inicializa la tabla del kernel en la posición cero:
   
+  llenar_directorio_de_paginas_de_kernel(page_directory_pirate, page_table_kernel_0);
+
+  // Ahora se inicializa la nueva tabla pirata en la segunda posición del directorio:
+
+  page_table_pirate = (page_table_entry*) mmu_direccion_fisica_de_la_proxima_pagina_libre();
+  
+  page_table_entry entrada = crear_entrada_nula_de_tabla_de_paginas();
+  entrada.p = 1;
+  entrada.rw = 1;
   // Manda la dir. lógica 0x400000 a la dir. física 0x500000:
-  llenar_tabla_de_paginas(page_table_pirate, pte, desplazamiento);
+  unsigned int desplazamiento = desplazamiento_para_funcion_de_mapeo(0x400000, 0x500000); 
+
+  llenar_tabla_de_paginas(page_table_pirate, entrada, desplazamiento);
+
+  page_directory_pirate[1].p = 1;
+  page_directory_pirate[1].rw = 1;
+  page_directory_pirate[1].base = ((unsigned int) page_table_pirate) >> 12;
 }
 
 void* mmu_direccion_fisica_de_la_proxima_pagina_libre() {
@@ -70,28 +74,33 @@ void llenar_tabla_de_paginas(page_table_entry* tabla, page_table_entry entrada, 
   }
 }
 
-void llenar_directorio_de_paginas(page_directory_entry* directorio, page_table_entry* primera_tabla) {
-  page_directory_entry entrada;
-  entrada.p = 0;
-  entrada.rw = 0;
-  entrada.us = 0;
-  entrada.pwt = 0;
-  entrada.pcd = 0;
-  entrada.a = 0;
-  entrada.ignored = 0;
-  entrada.ps = 0;
-  entrada.g = 0;
-  entrada.avl = 0;
-  entrada.base = 0;
+void llenar_directorio_de_paginas_de_kernel(page_directory_entry* directorio, page_table_entry* tabla) {
+  page_directory_entry entrada1;
+  entrada1.p = 0;
+  entrada1.rw = 0;
+  entrada1.us = 0;
+  entrada1.pwt = 0;
+  entrada1.pcd = 0;
+  entrada1.a = 0;
+  entrada1.ignored = 0;
+  entrada1.ps = 0;
+  entrada1.g = 0;
+  entrada1.avl = 0;
+  entrada1.base = 0;
 
   unsigned int i;
   for (i = 0; i < PAGE_ENTRIES_COUNT; i++) {
-    directorio[i] = entrada;
+    directorio[i] = entrada1;
   }
 
   directorio[0].p = 1;
   directorio[0].rw = 1;
-  directorio[0].base = ((unsigned int) primera_tabla) >> 12;
+  directorio[0].base = ((unsigned int) tabla) >> 12;
+
+  page_table_entry entrada2 = crear_entrada_nula_de_tabla_de_paginas();
+  entrada2.p = 1;
+  entrada2.rw = 1;
+  llenar_tabla_de_paginas(tabla, entrada2, 0);
 }
 
 page_table_entry crear_entrada_nula_de_tabla_de_paginas() {
