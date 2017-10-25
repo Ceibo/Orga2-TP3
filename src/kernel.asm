@@ -12,10 +12,11 @@ extern IDT_DESC
 extern idt_inicializar
 extern screen_inicializar
 extern imprimir_nombre_de_grupo
+extern mmu_inicializar
 extern mmu_inicializar_dir_kernel
-
-%define PAGE_TABLE_ADDRESS 0x28000
-%define PAGE_DIRECTORY_ADDRESS 0x27000
+extern mmu_inicializar_dir_pirata
+extern page_directory_kernel ; es una referencia al puntero de C, o sea un doble puntero a page_directory_entry
+extern page_table_kernel_0
 
 ;; Saltear seccion de datos
 jmp start
@@ -53,7 +54,7 @@ start:
     imprimir_texto_mr iniciando_mr_msg, iniciando_mr_len, 0x07, 0, 0
 
     ; Habilitar A20
-	call habilitar_A20
+	  call habilitar_A20
 
     ; Cargar la GDT
     lgdt [GDT_DESC]
@@ -96,12 +97,14 @@ start:
     call imprimir_nombre_de_grupo
 
     ; Inicializar el manejador de memoria
+    call mmu_inicializar
 
     ; Inicializar el directorio de paginas
     call mmu_inicializar_dir_kernel
+    call mmu_inicializar_dir_pirata
 
     ; Cargar directorio de paginas
-    mov eax, PAGE_DIRECTORY_ADDRESS
+    mov eax, [page_directory_kernel]
     mov cr3, eax
 
     ; Habilitar paginacion
@@ -157,21 +160,28 @@ limpiar_pantalla:
 	loop .ciclo	
 ret
 
-
 identity_mapping:
     mov ecx, 1024
-    mov ebx, PAGE_DIRECTORY_ADDRESS
-    mov dword [PAGE_DIRECTORY_ADDRESS], PAGE_TABLE_ADDRESS+0x3
-    mov ecx, 1024
-    mov ebx, PAGE_TABLE_ADDRESS
-    mov edx, 0x1000 * 1023
+    mov ebx, [page_directory_kernel] ; ebx = page directory address
+
     .pd:
         mov dword [ebx+ecx*4-4], 0x00000002
-    loop .pd
+    loop .pd    
+
+    mov eax, [page_table_kernel_0] ; eax = page table address
+
+    lea edx, [eax + 0x3]
+    mov [ebx], edx
+
+    mov ecx, 1024
+    mov ebx, [eax]
+    mov edx, 0x1000 * 1023
+    
     .pt:
         mov [ebx+ecx*4-4], edx
         add dword [ebx+ecx*4-4], 0x00000003
         sub edx, 0x1000
     loop .pt
-    mov dword [PAGE_TABLE_ADDRESS+512*4], 0x000B8003
+
+    mov dword [eax+512*4], 0x000B8003
 ret

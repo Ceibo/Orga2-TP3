@@ -16,10 +16,11 @@
 #define MAPA_BASE_FISICA  0x500000
 #define MAPA_BASE_VIRTUAL 0x800000
 
-#define PAGE_DIRECTORIES_COUNT 1024
-#define PAGE_TABLES_COUNT 1024
-#define PAGE_DIRECTORY_ADDRESS 0x27000
-#define PAGE_TABLE_ADDRESS 0x28000
+#define PAGE_ENTRIES_COUNT 1024
+#define INICIO_PAGINAS_LIBRES 0x100000
+
+#define KERNEL_PAGE_DIRECTORY_ADDRESS 0x27000
+#define KERNEL_PAGE_TABLE_ADDRESS_0 0x28000
 
 typedef struct struct_page_directory_entry {
     unsigned char   p:1;       // Present(1)
@@ -36,20 +37,37 @@ typedef struct struct_page_directory_entry {
 
 } __attribute__((__packed__, aligned (4))) page_directory_entry;
 
-void mmu_inicializar_dir_kernel();
-
 typedef struct struct_page_table_entry {
     unsigned char p:1;
     unsigned char rw:1;
-   	unsigned char	us:1;
-   	unsigned char	pwt:1;
-   	unsigned char	pcd:1;
-   	unsigned char	a:1;
-   	unsigned char	d:1;
-   	unsigned char	pat:1;
-   	unsigned char	g:1;
-   	unsigned char	avl:3;
-   	unsigned int	base:20;
+    unsigned char us:1;
+    unsigned char pwt:1;
+    unsigned char pcd:1;
+    unsigned char a:1;
+    unsigned char d:1;
+    unsigned char pat:1;
+    unsigned char g:1;
+    unsigned char avl:3;
+    unsigned int  base:20;
 } __attribute__((__packed__, aligned (4))) page_table_entry;
+
+page_directory_entry* page_directory_kernel;
+page_table_entry* page_table_kernel_0;
+
+page_directory_entry* page_directory_pirate;
+page_table_entry* page_table_pirate;
+
+void* proxima_pagina_libre;
+
+// Funciones del enunciado
+
+void mmu_inicializar_dir_kernel();
+void mmu_inicializar_dir_pirata();
+void* mmu_direccion_fisica_de_la_proxima_pagina_libre();
+void mmu_inicializar();
+
+// Funciones auxiliares creadas por nosotros
+
+void build_empty_page_directory(page_directory_entry* address);
 
 #endif	/* !__MMU_H__ */
