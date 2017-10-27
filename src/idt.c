@@ -50,4 +50,5 @@ void idt_inicializar() {
     IDT_ENTRY(17);
     IDT_ENTRY(18);
     IDT_ENTRY(19);
+    IDT_ENTRY(32); // Revisar los valores de esta entrada (no tuve tiempo)
 }

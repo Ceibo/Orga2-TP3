@@ -193,7 +193,9 @@ if(i == 18)
 	
 if(i == 19)
 	print("Interrupcion 19 ocurrida: SIMD Floating-Point Exception.", 0, 3, C_FG_LIGHT_GREY);
- 
+
+if(i == 32)
+	print("Interrupcion 32 ocurrida: Clock.", 0, 3, C_FG_LIGHT_GREY);
 }
 
 

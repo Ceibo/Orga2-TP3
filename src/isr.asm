@@ -27,11 +27,11 @@ extern print_isr
 global _isr%1
 
 _isr%1:
-	 
+
 	push %1
     call print_isr
-    add esp,4
-    
+    add esp, 4
+
     mov eax, %1
     jmp $
 
@@ -69,6 +69,16 @@ ISR 19
 ;;
 ;; Rutina de atención del RELOJ
 ;; -------------------------------------------------------------------------- ;;
+
+global _isr32
+extern clock_interrupt_routine
+_isr32:
+	push 32
+	call print_isr
+	add esp, 4
+	call clock_interrupt_routine
+	mov eax, 32
+    jmp $
 
 ;;
 ;; Rutina de atención del TECLADO
