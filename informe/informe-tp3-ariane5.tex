@@ -3,7 +3,8 @@
 \usepackage[spanish]{babel} % para que comandos como \today den el resultado en castellano
 \usepackage{a4wide} % márgenes un poco más anchos que lo usual
 \usepackage[conEntregas]{caratula}
-
+\usepackage{amsmath} % plain text
+\usepackage{verbatim}%
 \usepackage{graphicx} % figuras
 \usepackage{subfigure} % subfiguras
 
@@ -24,8 +25,16 @@
 
 \maketitle
 
+\tableofcontents
+
 \newpage
 
+\section{Introducción}
+\input{introduccion}
+
+\section{Desarrollo}
 \input{cuerpo-del-informe}
+
+ 
 
 \end{document}
