@@ -1,3 +1,6 @@
+
+
+
 ; ** por compatibilidad se omiten tildes **
 ; ==============================================================================
 ; TRABAJO PRACTICO 3 - System Programming - ORGANIZACION DE COMPUTADOR II - FCEN
@@ -17,6 +20,9 @@ extern mmu_inicializar_dir_kernel
 extern mmu_inicializar_dir_pirata
 extern page_directory_kernel ; es una referencia al puntero de C, o sea un doble puntero a page_directory_entry
 extern page_table_kernel_0
+
+extern resetear_pic
+extern habilitar_pic
 
 ;; Saltear seccion de datos
 jmp start
@@ -65,7 +71,7 @@ start:
     mov cr0, eax
 
     ; Saltar a modo protegido
-    jmp 0x40:modoprotegido
+    jmp 0x40:modoprotegido ;jmp 0x38:modoprotegido; 0011 1000
 
 	BITS 32
 	modoprotegido:
@@ -73,13 +79,14 @@ start:
     ; Establecer selectores de segmentos
 	xor eax, eax
 	
-	mov ax, 0x48 ; carga segmento de datos de nivel cero
+	mov ax, 0x48 ; carga segmento de datos de nivel cero 0100 1000, mov ax, 0x40 ;  0100 0000
+	
 	mov ds, ax
 	mov es, ax
 	mov ss, ax
 	mov gs, ax
 
-	mov ax, 0x60 ; carga segmento de video
+	mov ax, 0x60 ; carga segmento de video 0110 0000 , mov ax, 0x50 
 	mov fs, ax
 	
     ; Establecer la base de la pila
@@ -127,10 +134,13 @@ start:
 
     ; Configurar controlador de interrupciones
 
+    call resetear_pic; remapeo de interrupciones (5)
+    call habilitar_pic; habilitamos pic          (5)
     ; Cargar tarea inicial
 
     ; Habilitar interrupciones
-    sti
+     
+    sti; seteamos if flag tal que interrupciones externas son posibles (5)
 
     ; Saltar a la primera tarea: Idle
 
@@ -146,6 +156,7 @@ start:
 %include "a20.asm"
 
 BITS 32
+global limpiar_pantalla
 limpiar_pantalla:
 	; recorrer la memoria desde 0x0 hasta el límite del segmento de
 	; video (sacarlo de la GDT) e ir escribiendo cero en cada posición
