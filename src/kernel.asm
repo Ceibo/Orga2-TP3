@@ -123,8 +123,9 @@ start:
 
     ; Inicializar tss
     ;;call tss_inicializar
-    ;;DESCOMENTAR CUANDO ESTE COMPLETA
     ; Inicializar tss de la tarea Idle
+    ;;call tss_inicializar_idle
+    ;;DESCOMENTAR ESTAS DOS CUANDO ESTE COMPLETA
 
     ; Inicializar el scheduler
 
