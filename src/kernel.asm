@@ -17,6 +17,7 @@ extern mmu_inicializar_dir_kernel
 extern mmu_inicializar_dir_pirata
 extern page_directory_kernel ; es una referencia al puntero de C, o sea un doble puntero a page_directory_entry
 extern page_table_kernel_0
+extern tss_inicializar
 
 ;; Saltear seccion de datos
 jmp start
@@ -114,7 +115,8 @@ start:
     ;call identity_mapping
 
     ; Inicializar tss
-
+    ;;call tss_inicializar
+    ;;DESCOMENTAR CUANDO ESTE COMPLETA
     ; Inicializar tss de la tarea Idle
 
     ; Inicializar el scheduler

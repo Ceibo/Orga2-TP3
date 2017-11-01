@@ -37,6 +37,12 @@
 #define SEGMENT_TYPE___CODE_READ_EXECUTE 0x0A
 #define SEGMENT_TYPE___DATA_READ_WRITE 0x02
 
+#define SEGMENTO_CODIGO_NIVEL_0 8
+#define SEGMENTO_DATOS_NIVEL_0 9
+#define SEGMENTO_CODIGO_NIVEL_3 10
+#define SEGMENTO_DATOS_NIVEL_3 11
+#define SEGMENTO_PANTALLA 12
+
 
 /* Definicion de la GDT */
 /* -------------------------------------------------------------------------- */
@@ -63,7 +69,7 @@ gdt_entry gdt[GDT_COUNT] = {
     // [Ejercicio 1A] Agrego los 4 segmentos arrancando desde la posición 8
  
     // Segmento para código de nivel cero (kernel)
-    [8] = (gdt_entry) {
+    [SEGMENTO_CODIGO_NIVEL_0] = (gdt_entry) {
         (uint16_t)    0xcfff,
         (uint16_t)    SEGMENT_BASE_ADDRESS_0_15,
         (uint8_t)     SEGMENT_BASE_ADDRESS_23_16,
@@ -80,7 +86,7 @@ gdt_entry gdt[GDT_COUNT] = {
     },
     
     // Segmento para datos de nivel cero (kernel)
-    [9] = (gdt_entry) {
+    [SEGMENTO_DATOS_NIVEL_0] = (gdt_entry) {
         (uint16_t)    0xcfff,
         (uint16_t)    SEGMENT_BASE_ADDRESS_0_15,
         (uint8_t)     SEGMENT_BASE_ADDRESS_23_16,
@@ -97,7 +103,7 @@ gdt_entry gdt[GDT_COUNT] = {
     },
 
 	// Segmento para código de nivel tres
-    [10] = (gdt_entry) {
+    [SEGMENTO_CODIGO_NIVEL_3] = (gdt_entry) {
         (uint16_t)    0xcfff,
         (uint16_t)    SEGMENT_BASE_ADDRESS_0_15,
         (uint8_t)     SEGMENT_BASE_ADDRESS_23_16,
@@ -114,7 +120,7 @@ gdt_entry gdt[GDT_COUNT] = {
     },
 
 	// Segmento para datos de nivel tres
-    [11] = (gdt_entry) {
+    [SEGMENTO_DATOS_NIVEL_3] = (gdt_entry) {
         (uint16_t)    0xcfff,
         (uint16_t)    SEGMENT_BASE_ADDRESS_0_15,
         (uint8_t)     SEGMENT_BASE_ADDRESS_23_16,
@@ -131,7 +137,7 @@ gdt_entry gdt[GDT_COUNT] = {
     },
     
     // Segmento para la pantalla utilizado solo por el kernel
-    [12] = (gdt_entry) {
+    [SEGMENTO_PANTALLA] = (gdt_entry) {
         (uint16_t)    0x1f3f, // segment limit 0-15
         (uint16_t)    0x8000, // base address 0-15
         (uint8_t)     0x0B, // base address 16-23
