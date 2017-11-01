@@ -190,7 +190,8 @@ void game_terminar_si_es_hora()
 {
 }
 
-
+#define KB_y        0x15 // 0x95
+#define bc_y        0x95// break tecla y
 #define KB_w        0x11 // 0x91
 #define KB_s        0x1f // 0x9f
 #define KB_a        0x1e // 0x9e
@@ -205,6 +206,19 @@ void game_terminar_si_es_hora()
 #define KB_shiftR   0x36 // 0xb6
 
 
-void game_atender_teclado(uint8_t tecla)
+void game_atender_teclado(uint8_t tecla)//(5)
 {
+	switch (tecla)
+	{
+		case KB_y: screen_pintar('y', C_FG_LIGHT_GREY, 30, 50);break;
+		case bc_y: screen_pintar(219, C_FG_LIGHT_GREY, 30, 50);break;
+  
+		case KB_q: screen_pintar('q', C_FG_LIGHT_GREY, 30, 50);break;
+ 
+		case KB_a:  screen_pintar('a', C_FG_LIGHT_GREY, 30, 50);break;
+ 
+		case KB_k:   screen_pintar('k', C_FG_LIGHT_GREY, 30, 50);break;
+  
+		default: break;
+	}
 }
