@@ -35,7 +35,8 @@ typedef int int32_t;
 #define GDT_COUNT 30
 
 #define GDT_IDX_NULL_DESC           0
-#define GDT_IDLE 13
+#define GDT_TAREA_INICIAL 13
+#define GDT_IDLE 14
 
 /* Offsets en la gdt */
 /* -------------------------------------------------------------------------- */

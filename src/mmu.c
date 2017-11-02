@@ -137,11 +137,13 @@ void mmu_mapear_pagina(unsigned int direccion_virtual,
     tabla = mmu_direccion_fisica_de_la_proxima_pagina_libre();
     llenar_tabla_de_paginas(tabla, pte, 0);
     directorio_de_paginas[nro_tabla].base = ((unsigned int) tabla) >> 12;
+    directorio_de_paginas[nro_tabla].p = 1; //pde presente
+    directorio_de_paginas[nro_tabla].rw = 1;//r/w pde
   } else {
     tabla = (page_table_entry*) (directorio_de_paginas[nro_tabla].base << 12);
   }
 
-  tabla[nro_pagina] = pte;
+  tabla[nro_pagina] = pte;//pisamos anterior pte
   tabla[nro_pagina].p = 1;
   tabla[nro_pagina].rw = 1;
   tabla[nro_pagina].base = desplazamiento_para_funcion_de_mapeo(direccion_virtual, direccion_fisica);

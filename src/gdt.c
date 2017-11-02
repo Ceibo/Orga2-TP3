@@ -6,6 +6,7 @@
 */
 
 #include "gdt.h"
+#include "tss.h"
 
 // Formato de los define: A___B donde A es el nombre del campo y B es
 // el valor (A y B están separados por tres guiones bajos)
@@ -69,7 +70,7 @@ gdt_entry gdt[GDT_COUNT] = {
     // [Ejercicio 1A] Agrego los 4 segmentos arrancando desde la posición 8
  
     // Segmento para código de nivel cero (kernel)
-    [SEGMENTO_CODIGO_NIVEL_0] = (gdt_entry) {
+    [SEGMENTO_CODIGO_NIVEL_0] = (gdt_entry) {//8
         (uint16_t)    0xcfff,
         (uint16_t)    SEGMENT_BASE_ADDRESS_0_15,
         (uint8_t)     SEGMENT_BASE_ADDRESS_23_16,
@@ -86,7 +87,7 @@ gdt_entry gdt[GDT_COUNT] = {
     },
     
     // Segmento para datos de nivel cero (kernel)
-    [SEGMENTO_DATOS_NIVEL_0] = (gdt_entry) {
+    [SEGMENTO_DATOS_NIVEL_0] = (gdt_entry) {//9
         (uint16_t)    0xcfff,
         (uint16_t)    SEGMENT_BASE_ADDRESS_0_15,
         (uint8_t)     SEGMENT_BASE_ADDRESS_23_16,
@@ -103,7 +104,7 @@ gdt_entry gdt[GDT_COUNT] = {
     },
 
 	// Segmento para código de nivel tres
-    [SEGMENTO_CODIGO_NIVEL_3] = (gdt_entry) {
+    [SEGMENTO_CODIGO_NIVEL_3] = (gdt_entry) {//10
         (uint16_t)    0xcfff,
         (uint16_t)    SEGMENT_BASE_ADDRESS_0_15,
         (uint8_t)     SEGMENT_BASE_ADDRESS_23_16,
@@ -120,7 +121,7 @@ gdt_entry gdt[GDT_COUNT] = {
     },
 
 	// Segmento para datos de nivel tres
-    [SEGMENTO_DATOS_NIVEL_3] = (gdt_entry) {
+    [SEGMENTO_DATOS_NIVEL_3] = (gdt_entry) {//11
         (uint16_t)    0xcfff,
         (uint16_t)    SEGMENT_BASE_ADDRESS_0_15,
         (uint8_t)     SEGMENT_BASE_ADDRESS_23_16,
@@ -137,7 +138,7 @@ gdt_entry gdt[GDT_COUNT] = {
     },
     
     // Segmento para la pantalla utilizado solo por el kernel
-    [SEGMENTO_PANTALLA] = (gdt_entry) {
+    [SEGMENTO_PANTALLA] = (gdt_entry) {//12
         (uint16_t)    0x1f3f, // segment limit 0-15
         (uint16_t)    0x8000, // base address 0-15
         (uint8_t)     0x0B, // base address 16-23
@@ -151,7 +152,11 @@ gdt_entry gdt[GDT_COUNT] = {
         (uint8_t)     DEFAULT_OPERATION_SIZE___32_BITS,
         (uint8_t)     0x00, // granulatity = 0
         (uint8_t)     0x00 // base address 24-31
-    }
+    },
+    
+     //descriptor_tss  inicial en Indice 13
+    //descriptor_tss idle en Indice 14
+     
 };
 
 gdt_descriptor GDT_DESC = {
