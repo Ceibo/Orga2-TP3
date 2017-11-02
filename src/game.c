@@ -115,8 +115,9 @@ void game_pirata_inicializar(pirata_t *pirata, jugador_t *j, uint32_t  index, ui
 {
 }
 
-void game_tick(uint32_t  id_pirata)
-{
+void game_tick(uint32_t  id_pirata) {
+  screen_actualizar_reloj_global();
+  // Falta actualizar el reloj del pirata
 }
 
 

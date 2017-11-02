@@ -71,11 +71,11 @@ ISR 19
 ;; -------------------------------------------------------------------------- ;;
 
 global _isr32 ; (5)
-extern clock_interrupt_routine
+extern game_tick
  
 _isr32:
 	call fin_intr_pic1; comunicamos al pic que ya se atendiO la interrupciOn permitiendo nuevas llamadas desde el dispositivo.
-	call clock_interrupt_routine; rutina de reloj
+	call game_tick; rutina de reloj
 	iret; retornamos de la interrupciOn habilitando interrupciones.
 	;mov eax, 32
     ;jmp $
