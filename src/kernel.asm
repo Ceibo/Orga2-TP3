@@ -18,6 +18,8 @@ extern mmu_inicializar_dir_pirata
 extern page_directory_kernel ; es una referencia al puntero de C, o sea un doble puntero a page_directory_entry
 extern page_table_kernel_0
 
+;extern game_inicializar ; para probar, borrar después
+
 ;; Saltear seccion de datos
 jmp start
 
@@ -101,7 +103,6 @@ start:
 
     ; Inicializar el directorio de paginas
     call mmu_inicializar_dir_kernel
-    call mmu_inicializar_dir_pirata
 
     ; Cargar directorio de paginas
     mov eax, [page_directory_kernel]
@@ -111,7 +112,8 @@ start:
     mov eax, cr0
     or eax, 0x80000000
     mov cr0, eax
-    ;call identity_mapping
+    
+    ;call game_inicializar ; para probar, borrar después
 
     ; Inicializar tss
 

@@ -13,8 +13,8 @@ typedef enum direccion_e { ARR = 0x4, ABA = 0x7, DER = 0xA, IZQ = 0xD} direccion
 
 #define MAX_CANT_PIRATAS_VIVOS           8
 
-#define JUGADOR_A                         0
-#define JUGADOR_B                         1
+#define INDICE_JUGADOR_A                         0
+#define INDICE_JUGADOR_B                         1
 
 #define MAPA_ANCHO                       80
 #define MAPA_ALTO                        44
@@ -42,7 +42,7 @@ typedef struct jugador_t
 extern jugador_t jugadorA, jugadorB;
 
 // ~ auxiliares dadas ~
-uint32_t game_xy2lineal();
+uint32_t game_xy2lineal(uint32_t x, uint32_t y);
 pirata_t* id_pirata2pirata(uint32_t id);
 
 // ~ auxiliares sugeridas o requeridas (segun disponga enunciado) ~

@@ -37,7 +37,7 @@ void* error()
 	return 0;
 }
 
-uint32_t  game_xy2lineal (uint32_t  x, uint32_t  y) {
+uint32_t  game_xy2lineal (uint32_t x, uint32_t y) {
 	return (y * MAPA_ANCHO + x);
 }
 
@@ -93,8 +93,9 @@ void game_calcular_posiciones_vistas(int *vistas_x, int *vistas_y, int x, int y)
 }
 
 
-void game_inicializar()
-{
+void game_inicializar() {
+  // Código de prueba, borrar después
+  lcr3((uint32_t) mmu_inicializar_dir_pirata(0x10000, 0x500000 + game_xy2lineal(1, 1)*0x1000, INDICE_JUGADOR_A));
 }
 
 void game_jugador_inicializar_mapa(jugador_t *jug)
