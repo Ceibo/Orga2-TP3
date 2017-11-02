@@ -17,6 +17,11 @@ extern mmu_inicializar_dir_kernel
 extern mmu_inicializar_dir_pirata
 extern page_directory_kernel ; es una referencia al puntero de C, o sea un doble puntero a page_directory_entry
 extern page_table_kernel_0
+extern tss_inicializar
+extern mmu_mapear_pagina
+extern resetear_pic
+extern habilitar_pic
+extern inic_descriptor_tss
 
 ;extern game_inicializar ; para probar, borrar después
 
@@ -67,21 +72,19 @@ start:
     mov cr0, eax
 
     ; Saltar a modo protegido
-    jmp 0x40:modoprotegido
-
-	BITS 32
+    jmp 0x40:modoprotegido ;jmp 0x38:modoprotegido; 0011 1000
+    
+BITS 32
 	modoprotegido:
 
     ; Establecer selectores de segmentos
 	xor eax, eax
-	
-	mov ax, 0x48 ; carga segmento de datos de nivel cero
+	mov ax, 0x48 ; carga segmento de datos de nivel cero 0100 1000,  
 	mov ds, ax
 	mov es, ax
 	mov ss, ax
 	mov gs, ax
-
-	mov ax, 0x60 ; carga segmento de video
+	mov ax, 0x60 ; carga segmento de video 0110 0000 ,  
 	mov fs, ax
 	
     ; Establecer la base de la pila
@@ -116,9 +119,8 @@ start:
     ;call game_inicializar ; para probar, borrar después
 
     ; Inicializar tss
-
-    ; Inicializar tss de la tarea Idle
-
+    ; Inicializar tss de la tarea Idle(6)
+    call tss_inicializar; inicializa tarea idle 
     ; Inicializar el scheduler
 
     ; Inicializar la IDT
@@ -127,15 +129,39 @@ start:
     ; Cargar IDT
     lidt [IDT_DESC]
 
-    ; Configurar controlador de interrupciones
+    ; Configurar controlador de interrupciones(5)
+    call resetear_pic; remapeo de interrupciones 
+    call habilitar_pic; habilitamos pic           
+    
+    ; Cargar tarea inicial(6)
+    push 13;parAmetro inic_descriptor_tss, descriptor de tarea inicial 
+    call inic_descriptor_tss
+    add esp,4
+    push 14;parAmetro inic_descriptor_tss, descriptor de tarea idle
+    call inic_descriptor_tss
+    add esp,4
+    
+    ; Habilitar interrupciones(5)
+    sti; seteamos if flag tal que interrupciones externas son posibles 
 
-    ; Cargar tarea inicial
+    ; Saltar a la primera tarea: Idle  (6)
+	mov ax,0x0068; (0000 0000 0 1101 000)b ,13, selector indiza a descriptor tss inicial en gdt (6)
+	ltr ax; cargamos selector a descriptor de tss idle en registro tr
+	;xchg bx,bx ; magic breakpoint *******
 
-    ; Habilitar interrupciones
-    sti
+	;mapeo tarea idle *********** revisar mmu_mapear_pagina (posiblemente pAginas no presentes)**
+	push 0x00016000; 1er parAmetro call
+	push 0x00016000; 2do parAmetro call
+	mov eax, cr3
+	push eax; 3er parAmetro call
+	call mmu_mapear_pagina
+	add esp,4
+	add esp,4
+	add esp,4
+	
+	jmp 0x70:0; (0000 0000 0 1110 000)b ,Indice 14 ,salto a tarea idle
 
-    ; Saltar a la primera tarea: Idle
-
+	
     ; Ciclar infinitamente (por si algo sale mal...)
     mov eax, 0xFFFF
     mov ebx, 0xFFFF
@@ -148,6 +174,7 @@ start:
 %include "a20.asm"
 
 BITS 32
+global limpiar_pantalla
 limpiar_pantalla:
 	; recorrer la memoria desde 0x0 hasta el límite del segmento de
 	; video (sacarlo de la GDT) e ir escribiendo cero en cada posición

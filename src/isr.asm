@@ -70,20 +70,34 @@ ISR 19
 ;; Rutina de atención del RELOJ
 ;; -------------------------------------------------------------------------- ;;
 
-global _isr32
+global _isr32 ; (5)
 extern clock_interrupt_routine
+ 
 _isr32:
-	push 32
-	call print_isr
-	add esp, 4
-	call clock_interrupt_routine
-	mov eax, 32
-    jmp $
+	call fin_intr_pic1; comunicamos al pic que ya se atendiO la interrupciOn permitiendo nuevas llamadas desde el dispositivo.
+	call clock_interrupt_routine; rutina de reloj
+	iret; retornamos de la interrupciOn habilitando interrupciones.
+	;mov eax, 32
+    ;jmp $
 
 ;;
 ;; Rutina de atención del TECLADO
 ;; -------------------------------------------------------------------------- ;;
+;BITS 32
+global _isr33 ; (5)
+  
+ extern game_atender_teclado
+_isr33:
+	call fin_intr_pic1; comunicamos al pic que ya se atendiO la interrupciOn permitiendo nuevas llamadas desde el dispositivo.
+	 
 
+	push eax; guardamos registro
+	in al,0x60; leemos teclado
+	push eax; pasamos parAmetro a procedimiento siguiente
+	call game_atender_teclado; rutina de teclado
+ 	add esp,4
+	pop eax
+	iret;
 ;;
 ;; Rutinas de atención de las SYSCALLS
 ;; -------------------------------------------------------------------------- ;;

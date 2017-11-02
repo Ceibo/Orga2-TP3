@@ -180,6 +180,8 @@ void mmu_mapear_pagina(unsigned int direccion_virtual,
     tabla = mmu_direccion_fisica_de_la_proxima_pagina_libre();
     llenar_tabla_de_paginas(tabla, entrada, FALSE);
     directorio_de_paginas[nro_tabla].base = ((unsigned int) tabla) >> 12;
+    directorio_de_paginas[nro_tabla].p = 1; //pde presente
+    directorio_de_paginas[nro_tabla].rw = 1;//r/w pde
   } else {
     tabla = (page_table_entry*) (directorio_de_paginas[nro_tabla].base << 12);
   }
