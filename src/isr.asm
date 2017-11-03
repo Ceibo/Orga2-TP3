@@ -33,7 +33,8 @@ _isr%1:
     add esp, 4
 
     mov eax, %1
-    jmp $
+    ;jmp $
+    iret
 
 %endmacro
 

@@ -38,6 +38,10 @@ void mmu_inicializar_dir_kernel() {
   mapear_paginas_de_kernel(page_directory_kernel);
 }
 
+void mmu_prueba() {
+  mmu_mapear_pagina(0x400000, 0x500000, (page_directory_entry*) rcr3());
+}
+
 page_directory_entry* mmu_inicializar_dir_pirata(uint32_t direccion_fisica_de_origen_del_codigo,
     uint32_t direccion_fisica_de_destino_del_codigo, uint32_t indice_del_jugador) {
   page_directory_entry* directorio = (page_directory_entry*) mmu_direccion_fisica_de_la_proxima_pagina_libre();
