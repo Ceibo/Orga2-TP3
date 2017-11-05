@@ -101,6 +101,13 @@ _isr33:
 	iret;
 ;;
 ;; Rutinas de atención de las SYSCALLS
+global _isr46 ; (5)
+  
+_isr46:
+	call fin_intr_pic1; comunicamos al pic que ya se atendiO la interrupciOn permitiendo nuevas llamadas desde el dispositivo.
+	mov eax,0x00000042
+	iret;
+
 ;; -------------------------------------------------------------------------- ;;
 
 
