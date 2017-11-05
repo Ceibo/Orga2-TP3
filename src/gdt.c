@@ -70,15 +70,17 @@ gdt_entry gdt[GDT_COUNT] = {
     // [Ejercicio 1A] Agrego los 4 segmentos arrancando desde la posición 8
  
     // Segmento para código de nivel cero (kernel)
+    //lImite modificado: 0x1F3FF tal que ((0x1F3FF + 0x1 )* 0x1000) - 0x1 = 500 megas
+    //anterior lImite: 0x7cfff.
     [SEGMENTO_CODIGO_NIVEL_0] = (gdt_entry) {//8
-        (uint16_t)    0xcfff,
+        (uint16_t)    0xF3FF ,
         (uint16_t)    SEGMENT_BASE_ADDRESS_0_15,
         (uint8_t)     SEGMENT_BASE_ADDRESS_23_16,
         (uint8_t)     SEGMENT_TYPE___CODE_READ_EXECUTE,
         (uint8_t)     DESCRIPTOR_TYPE___CODE_OR_DATA,
         (uint8_t)     DESCRIPTOR_PRIVILEGE_LEVEL___ZERO,
         (uint8_t)     SEGMENT_PRESENT___YES,
-        (uint8_t)     0x7,// hexa mAs significativo de lImite tal que lImite es 0x7cfff,
+        (uint8_t)     0x1,// hexa mAs significativo de lImite tal que lImite es 0x1F3FF,
         (uint8_t)     AVAILABLE_FOR_USE_BY_SYSTEM_SOFTWARE,
         (uint8_t)     CODE_SEGMENT_64_BIT,
         (uint8_t)     DEFAULT_OPERATION_SIZE___32_BITS,
@@ -88,14 +90,14 @@ gdt_entry gdt[GDT_COUNT] = {
     
     // Segmento para datos de nivel cero (kernel)
     [SEGMENTO_DATOS_NIVEL_0] = (gdt_entry) {//9
-        (uint16_t)    0xcfff,
+        (uint16_t)    0xF3FF,
         (uint16_t)    SEGMENT_BASE_ADDRESS_0_15,
         (uint8_t)     SEGMENT_BASE_ADDRESS_23_16,
         (uint8_t)     SEGMENT_TYPE___DATA_READ_WRITE,
         (uint8_t)     DESCRIPTOR_TYPE___CODE_OR_DATA,
         (uint8_t)     DESCRIPTOR_PRIVILEGE_LEVEL___ZERO,
         (uint8_t)     SEGMENT_PRESENT___YES,
-        (uint8_t)     0x7,// hexa mAs significativo de lImite tal que lImite es 0x7cfff,,
+        (uint8_t)     0x1,// hexa mAs significativo de lImite tal que lImite es 0x1F3FF,,
         (uint8_t)     AVAILABLE_FOR_USE_BY_SYSTEM_SOFTWARE,
         (uint8_t)     CODE_SEGMENT_64_BIT,
         (uint8_t)     DEFAULT_OPERATION_SIZE___32_BITS,
@@ -105,14 +107,14 @@ gdt_entry gdt[GDT_COUNT] = {
 
 	// Segmento para código de nivel tres
     [SEGMENTO_CODIGO_NIVEL_3] = (gdt_entry) {//10
-        (uint16_t)    0xcfff,
+        (uint16_t)    0xF3FF,
         (uint16_t)    SEGMENT_BASE_ADDRESS_0_15,
         (uint8_t)     SEGMENT_BASE_ADDRESS_23_16,
         (uint8_t)     SEGMENT_TYPE___CODE_READ_EXECUTE,
         (uint8_t)     DESCRIPTOR_TYPE___CODE_OR_DATA,
         (uint8_t)     DESCRIPTOR_PRIVILEGE_LEVEL___THREE,
         (uint8_t)     SEGMENT_PRESENT___YES,
-        (uint8_t)     0x7,// hexa mAs significativo de lImite tal que lImite es 0x7cfff,
+        (uint8_t)     0x1,// hexa mAs significativo de lImite tal que lImite es 0x1F3FF,
         (uint8_t)     AVAILABLE_FOR_USE_BY_SYSTEM_SOFTWARE,
         (uint8_t)     CODE_SEGMENT_64_BIT,
         (uint8_t)     DEFAULT_OPERATION_SIZE___32_BITS,
@@ -122,14 +124,14 @@ gdt_entry gdt[GDT_COUNT] = {
 
 	// Segmento para datos de nivel tres
     [SEGMENTO_DATOS_NIVEL_3] = (gdt_entry) {//11
-        (uint16_t)    0xcfff,
+        (uint16_t)    0xF3FF,//0x1F3FF tal que ((0x1F3FF + 0x1 )* 0x1000) - 0x1 = 500 megas
         (uint16_t)    SEGMENT_BASE_ADDRESS_0_15,
         (uint8_t)     SEGMENT_BASE_ADDRESS_23_16,
         (uint8_t)     SEGMENT_TYPE___DATA_READ_WRITE,
         (uint8_t)     DESCRIPTOR_TYPE___CODE_OR_DATA,
         (uint8_t)     DESCRIPTOR_PRIVILEGE_LEVEL___THREE,
         (uint8_t)     SEGMENT_PRESENT___YES,
-        (uint8_t)     0x7,// hexa mAs significativo de lImite tal que lImite es 0x7cfff,,
+        (uint8_t)     0x1,// hexa mAs significativo de lImite tal que lImite es 0x1F3FF,,
         (uint8_t)     AVAILABLE_FOR_USE_BY_SYSTEM_SOFTWARE,
         (uint8_t)     CODE_SEGMENT_64_BIT,
         (uint8_t)     DEFAULT_OPERATION_SIZE___32_BITS,
