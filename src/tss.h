@@ -57,5 +57,6 @@ typedef struct str_tss {
 
 void tss_inicializar();
 void inic_descriptor_tss(int indice);
- 
+ void tss_libre(int pirata, uint32_t jugador, uint32_t origen, uint32_t dirFisDestinoCod);
+
 #endif  /* !__TSS_H__ */

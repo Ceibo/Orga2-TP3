@@ -45,6 +45,15 @@ typedef int int32_t;
 
 /* Selectores de segmentos */
 /* -------------------------------------------------------------------------- */
+/* Direcciones fIsicas del origen cOdigo tareas */
+/* -------------------------------------------------------------------------- */
+#define TAREA_A_E         0X10000
+
+#define TAREA_A_M         0X11000
+
+#define TAREA_B_E         0X12000
+
+#define TAREA_B_M         0X13000
 
 void* error();
 

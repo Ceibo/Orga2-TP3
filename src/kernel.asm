@@ -130,21 +130,6 @@ BITS 32
     ; Cargar IDT
     lidt [IDT_DESC]
 
-    ; Prueba (borrar luego)
-    xchg bx, bx
-    sti
-    xchg bx, bx ; en este punto info tab debería mostrar una sola línea con el área del kernel
-    call mmu_prueba
-    xchg bx, bx ; en este punto info tab debería mostrar dos líneas, la primera con el área del kernel y la segunda con 0x400000 a 0x500000
-    call mmu_prueba ; se hace una vez más para probar el caso que ya está mapeada
-    xchg bx, bx
-    mov eax, 0xFFFFFFFF
-    mov ebx, 0
-    xchg bx, bx ; en este punto escribir regs en bochs para verificar que eax vale 0xFFFFFFFF y ebx vale 0
-    mov [0x400000], eax
-    mov ebx, [0x400000]
-    xchg bx, bx ; en este punto volver a escribir regs para ver que ebx cambió su valor => funcionó la paginación
-
     ; Configurar controlador de interrupciones(5)
     call resetear_pic; remapeo de interrupciones 
     call habilitar_pic; habilitamos pic           
@@ -164,14 +149,6 @@ BITS 32
 	mov ax,0x0068; (0000 0000 0 1101 000)b ,13, selector indiza a descriptor tss inicial en gdt (6)
 	ltr ax; cargamos selector a descriptor de tss idle en registro tr
 	;xchg bx,bx ; magic breakpoint *******
-
-	;mapeo tarea idle *********** revisar mmu_mapear_pagina (posiblemente pAginas no presentes)**
-	push 0x00016000; 1er parAmetro call
-	push 0x00016000; 2do parAmetro call
-	mov eax, cr3
-	push eax; 3er parAmetro call
-	call mmu_mapear_pagina
-	add esp, 12
 	
 	jmp 0x70:0; (0000 0000 0 1110 000)b ,Indice 14 ,salto a tarea idle
 
