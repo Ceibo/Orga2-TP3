@@ -8,21 +8,21 @@
 #include "tss.h"
 #include "mmu.h"
  
-//macro para definir descriptor de tss en gdt
-#define GDT_ENTRY(indice,estr_tss,nivel)                                                                  \
-    gdt[indice].limit_0_15 = 0x67;                                                                        \
-	gdt[indice].base_0_15 = (unsigned short) ((unsigned int)(&estr_tss) & (unsigned int) 0xFFFF);         \
-	gdt[indice].base_23_16 = (unsigned short) ((unsigned int)(&estr_tss) >> 16 & (unsigned int) 0xFFFF);  \
-	gdt[indice].type = 0x9;                                                                               \
-	gdt[indice].s = 0x0;                                                                                  \
-	gdt[indice].dpl = nivel;                                                                              \
-	gdt[indice].p = 0x1;                                                                                  \
-	gdt[indice].limit_16_19 = 0x0;                                                                        \
-	gdt[indice].avl = 0x1;                                                                                \
-	gdt[indice].l = 0x0 ;                                                                                 \
-	gdt[indice].db = 0x0;                                                                                 \
-	gdt[indice].g = 0x0;                                                                                  \
-	gdt[indice].base_31_24 = (unsigned short) ((unsigned int)(&estr_tss) >> 24 & (unsigned int) 0xFFFF);  
+//macro para definir descriptor de tss en gdt  
+#define GDT_ENTRY(gdt_ind,estr_tss,nivel)                                                                  \
+    gdt_ind.limit_0_15 = 0x67;                                                                        \
+	gdt_ind.base_0_15 = (unsigned short) ((unsigned int)(&estr_tss) & (unsigned int) 0xFFFF);         \
+	gdt_ind.base_23_16 = (unsigned short) ((unsigned int)(&estr_tss) >> 16 & (unsigned int) 0xFFFF);  \
+	gdt_ind.type = 0x9;                                                                               \
+	gdt_ind.s = 0x0;                                                                                  \
+	gdt_ind.dpl = nivel;                                                                              \
+	gdt_ind.p = 0x1;                                                                                  \
+	gdt_ind.limit_16_19 = 0x0;                                                                        \
+	gdt_ind.avl = 0x1;                                                                                \
+	gdt_ind.l = 0x0 ;                                                                                 \
+	gdt_ind.db = 0x0;                                                                                 \
+	gdt_ind.g = 0x0;                                                                                  \
+	gdt_ind.base_31_24 = (unsigned short) ((unsigned int)(&estr_tss) >> 24 & (unsigned int) 0xFFFF);  
 
 //macro para llenar campos de tss
 #define TSS_ENTRY(estructura,reg_ctrl_3,eip_reg,esp_seg,ebp_seg,es_seg,cs_seg,ss_seg,ds_seg,fs_seg,gs_seg,esp0_dir,ss0_seg)         \
@@ -86,17 +86,18 @@ void tss_inicializar() {
 //inicializamos descriptores
 void inic_descriptor_tss(int i){
 	 if(i == 13){
-	  GDT_ENTRY(GDT_TAREA_INICIAL, tss_inicial, 0x0);
-	  return;
+	   GDT_ENTRY(gdt[i], tss_inicial, 0x0);
+	   return;
      }
      if(i == 14){
-     GDT_ENTRY(GDT_IDLE, tss_idle, 0x0);
+       GDT_ENTRY(gdt[i], tss_idle, 0x0);
+       return;
      }
-     else
+     else 
 	  return;
  }; 
  
-/* */
+ 
 
 //inicializamos tss pirata 
 //argumentos: Indice en array de tss de jugador, jugador (ver game.h), direcciOn fIsica origen tarea 
