@@ -111,14 +111,14 @@ void tss_libre(int pirata, uint32_t jugador, uint32_t origen, uint32_t dirFisDes
 	 //ss0 : selector de segmento de pila de kernel porque la pAgina pedida para la pila estA en 
 	 // el area libre y se mapea con identity mapping (ver enunciado en pAgina 4 antes de scheduler)
 	 //eip: 0x400000, direcciOn virtual de cOdigo tarea
-	 // ebp pila nivel 3: 0x400fff, //direcciOn virtual base pAgina tarea 
-	 // esp nivel 3:0x400ff3,//direcciOn virtual base pAgina tarea - 4*3 (argumentos y eip anterior)
+	 // ebp pila nivel 3: 0x401000, //direcciOn virtual base pAgina tarea 
+	 // esp nivel 3:0x400ff4,//direcciOn virtual base pAgina tarea - 4*3 (argumentos y eip anterior)
 	 // es,ss,ds,fs,gs : 0x005b (0000 0000 0101 1011)b , segmento datos nivel 3 en gdt
 	 //cs : 0x0053 (0000 0000 0101 0011)b; segmento cOdigo nivel 3 en gdt
   if(jugador == INDICE_JUGADOR_A){
-    TSS_ENTRY(tss_jugadorA[pirata],reg_ctrl_3,0x400000,0x400ff3,0x400fff,0x005b,0x0053,0x005b,0x005b,0x005b,0x005b,esp_0,0x0048);    
+    TSS_ENTRY(tss_jugadorA[pirata],reg_ctrl_3,0x400000,0x400ff4,0x401000,0x005b,0x0053,0x005b,0x005b,0x005b,0x005b,esp_0,0x0048);    
  }else{
-    TSS_ENTRY(tss_jugadorB[pirata],reg_ctrl_3,0x400000,0x400ff3,0x400fff,0x005b,0x0053,0x005b,0x005b,0x005b,0x005b,esp_0,0x0048);    
+    TSS_ENTRY(tss_jugadorB[pirata],reg_ctrl_3,0x400000,0x400ff4,0x401000,0x005b,0x0053,0x005b,0x005b,0x005b,0x005b,esp_0,0x0048);    
  }
 };
 
