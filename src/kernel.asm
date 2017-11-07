@@ -23,7 +23,7 @@ extern resetear_pic
 extern habilitar_pic
 extern inic_descriptor_tss
 
-;extern game_inicializar ; para probar, borrar después
+extern game_inicializar ; para probar, borrar después
 
 ;; Saltear seccion de datos
 jmp start
@@ -116,7 +116,7 @@ BITS 32
     or eax, 0x80000000
     mov cr0, eax
     
-    ;call game_inicializar ; para probar, borrar después
+    call game_inicializar ; para probar, borrar después
 
     ; Inicializar tss
     ; Inicializar tss de la tarea Idle(6)

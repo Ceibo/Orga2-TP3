@@ -65,9 +65,11 @@ page_directory_entry* mmu_inicializar_dir_pirata(uint32_t direccion_fisica_de_or
       direccion_fisica_de_destino_del_codigo, directorio_actual);
   uint8_t* direccion_virtual_de_origen_del_codigo = (uint8_t*) direccion_fisica_de_origen_del_codigo; // Coinciden
   uint8_t i;
+  breakpoint();
   for (i = 0; i < PAGE_SIZE; i++) {
     direccion_virtual_de_destino_del_codigo[i] = direccion_virtual_de_origen_del_codigo[i];
   }
+  breakpoint();
   mmu_desmapear_pagina((uint32_t) direccion_virtual_de_destino_del_codigo, directorio_actual);
 
   return directorio;
