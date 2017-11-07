@@ -24,7 +24,6 @@ extern habilitar_pic
 extern inic_descriptor_tss
 
 ;extern game_inicializar ; para probar, borrar después
-extern mmu_prueba
 
 ;; Saltear seccion de datos
 jmp start

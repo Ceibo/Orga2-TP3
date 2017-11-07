@@ -72,6 +72,7 @@ void mmu_mapear_pagina_especificando_direccion_de_tabla(unsigned int direccion_v
 void mmu_desmapear_pagina(unsigned int direccion_virtual, page_directory_entry* directorio_de_paginas);
 
 page_table_entry crear_entrada_nula_de_tabla_de_paginas();
+page_directory_entry crear_entrada_nula_de_directorio_de_paginas();
 void llenar_tabla_de_paginas(page_table_entry* tabla, page_table_entry entrada, bool mapeo_kernel);
 void mapear_paginas_de_kernel(page_directory_entry* directorio);
 void mapear_paginas_matricialmente_contiguas(page_directory_entry* directorio,

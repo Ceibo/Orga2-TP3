@@ -59,12 +59,12 @@ page_directory_entry* mmu_inicializar_dir_pirata(uint32_t direccion_fisica_de_or
       direccion_fisica_de_destino_del_codigo, directorio);
 
   // Se copia el código del origen a la posición inicial del jugador en el mapa:
-  uint32_t* direccion_virtual_de_destino_del_codigo = (uint32_t*) DIRECCION_VIRTUAL_DE_INICIO_DE_TAREAS + 10 * PAGE_SIZE;
+  uint8_t* direccion_virtual_de_destino_del_codigo = (uint8_t*) DIRECCION_VIRTUAL_DE_INICIO_DE_TAREAS + 10 * PAGE_SIZE;
   page_directory_entry* directorio_actual = (page_directory_entry*) rcr3();
   mmu_mapear_pagina((uint32_t) direccion_virtual_de_destino_del_codigo,
       direccion_fisica_de_destino_del_codigo, directorio_actual);
-  uint32_t* direccion_virtual_de_origen_del_codigo = (uint32_t*) direccion_fisica_de_origen_del_codigo; // Coinciden
-  uint32_t i;
+  uint8_t* direccion_virtual_de_origen_del_codigo = (uint8_t*) direccion_fisica_de_origen_del_codigo; // Coinciden
+  uint8_t i;
   for (i = 0; i < PAGE_SIZE; i++) {
     direccion_virtual_de_destino_del_codigo[i] = direccion_virtual_de_origen_del_codigo[i];
   }
@@ -118,19 +118,7 @@ void llenar_tabla_de_paginas(page_table_entry* tabla, page_table_entry entrada, 
 }
 
 void llenar_directorio(page_directory_entry* directorio) {
-  page_directory_entry entrada;
-  entrada.p = 0;
-  entrada.rw = 0;
-  entrada.us = 0;
-  entrada.pwt = 0;
-  entrada.pcd = 0;
-  entrada.a = 0;
-  entrada.ignored = 0;
-  entrada.ps = 0;
-  entrada.g = 0;
-  entrada.avl = 0;
-  entrada.base = 0;
-
+  page_directory_entry entrada = crear_entrada_nula_de_directorio_de_paginas();
   unsigned int i;
   for (i = 0; i < PAGE_ENTRIES_COUNT; i++) {
     directorio[i] = entrada;
@@ -160,6 +148,22 @@ page_table_entry crear_entrada_nula_de_tabla_de_paginas() {
   entrada.a = 0;
   entrada.d = 0;
   entrada.pat = 0;
+  entrada.g = 0;
+  entrada.avl = 0;
+  entrada.base = 0;
+  return entrada;
+}
+
+page_directory_entry crear_entrada_nula_de_directorio_de_paginas() {
+  page_directory_entry entrada;
+  entrada.p = 0;
+  entrada.rw = 0;
+  entrada.us = 0;
+  entrada.pwt = 0;
+  entrada.pcd = 0;
+  entrada.a = 0;
+  entrada.ignored = 0;
+  entrada.ps = 0;
   entrada.g = 0;
   entrada.avl = 0;
   entrada.base = 0;
@@ -209,13 +213,17 @@ void mmu_mapear_pagina_especificando_direccion_de_tabla(unsigned int direccion_v
   // Esta implementación asume que el directorio existe de acuerdo a la clase
   // de MMU de Lautaro Petaccio. Revisar.
 
-  directorio_de_paginas[nro_tabla].base = ((unsigned int) tabla) >> 12;
+  page_directory_entry entrada_al_directorio = crear_entrada_nula_de_directorio_de_paginas();
+  entrada_al_directorio.base = ((unsigned int) tabla) >> 12;
+  entrada_al_directorio.p = 1;
+  entrada_al_directorio.rw = 1;
+  directorio_de_paginas[nro_tabla] = entrada_al_directorio;
 
-  page_table_entry entrada = crear_entrada_nula_de_tabla_de_paginas();
-  entrada.p = 1;
-  entrada.rw = 1;
-  entrada.base = direccion_fisica >> 12;
-  tabla[nro_pagina] = entrada;
+  page_table_entry entrada_a_la_tabla = crear_entrada_nula_de_tabla_de_paginas();
+  entrada_a_la_tabla.p = 1;
+  entrada_a_la_tabla.rw = 1;
+  entrada_a_la_tabla.base = direccion_fisica >> 12;
+  tabla[nro_pagina] = entrada_a_la_tabla;
 
   tlbflush();
 }
