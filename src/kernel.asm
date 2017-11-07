@@ -142,7 +142,8 @@ BITS 32
     add esp,4
     
     ; Habilitar interrupciones(5)
-    sti; seteamos if flag tal que interrupciones externas son posibles 
+    ; no hace falta sti, se setea en eflags de cada tarea
+    ;sti; seteamos if flag tal que interrupciones externas son posibles 
 
     ; Saltar a la primera tarea: Idle  (6)
 	mov ax,0x0068; (0000 0000 0 1101 000)b ,13, selector indiza a descriptor tss inicial en gdt (6)

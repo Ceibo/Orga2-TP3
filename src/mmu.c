@@ -38,10 +38,6 @@ void mmu_inicializar_dir_kernel() {
   mapear_paginas_de_kernel(page_directory_kernel);
 }
 
-void mmu_prueba() {
-  mmu_mapear_pagina(0x400000, 0x500000, (page_directory_entry*) rcr3());
-}
-
 page_directory_entry* mmu_inicializar_dir_pirata(uint32_t direccion_fisica_de_origen_del_codigo,
     uint32_t direccion_fisica_de_destino_del_codigo, uint32_t indice_del_jugador) {
   page_directory_entry* directorio = (page_directory_entry*) mmu_direccion_fisica_de_la_proxima_pagina_libre();
@@ -59,13 +55,14 @@ page_directory_entry* mmu_inicializar_dir_pirata(uint32_t direccion_fisica_de_or
       direccion_fisica_de_destino_del_codigo, directorio);
 
   // Se copia el código del origen a la posición inicial del jugador en el mapa:
-  uint8_t* direccion_virtual_de_destino_del_codigo = (uint8_t*) DIRECCION_VIRTUAL_DE_INICIO_DE_TAREAS + 10 * PAGE_SIZE;
+  uint32_t* direccion_virtual_de_destino_del_codigo = (uint32_t*) DIRECCION_VIRTUAL_DE_INICIO_DE_TAREAS + 10 * PAGE_SIZE;
   page_directory_entry* directorio_actual = (page_directory_entry*) rcr3();
   mmu_mapear_pagina((uint32_t) direccion_virtual_de_destino_del_codigo,
       direccion_fisica_de_destino_del_codigo, directorio_actual);
-  uint8_t* direccion_virtual_de_origen_del_codigo = (uint8_t*) direccion_fisica_de_origen_del_codigo; // Coinciden
-  uint8_t i;
-  for (i = 0; i < PAGE_SIZE; i++) {
+  uint32_t* direccion_virtual_de_origen_del_codigo = (uint32_t*) direccion_fisica_de_origen_del_codigo; // Coinciden
+  uint32_t i;
+  const uint32_t cant_a_copiar = PAGE_SIZE >> 2; // si copiáramos con uint8_t no haría falta dividir por 4
+  for (i = 0; i < cant_a_copiar; i++) {
     direccion_virtual_de_destino_del_codigo[i] = direccion_virtual_de_origen_del_codigo[i];
   }
   mmu_desmapear_pagina((uint32_t) direccion_virtual_de_destino_del_codigo, directorio_actual);
