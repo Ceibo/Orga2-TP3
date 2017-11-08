@@ -218,7 +218,7 @@ void mmu_mapear_pagina_especificando_direccion_de_tabla(unsigned int direccion_v
 
   page_table_entry entrada_a_la_tabla = crear_entrada_nula_de_tabla_de_paginas();
   entrada_a_la_tabla.p = 1;
-  entrada_a_la_tabla.rw = 1;
+  entrada_a_la_tabla.rw = 0; // 0 = read-only; 1 = read/write
   entrada_a_la_tabla.base = direccion_fisica >> 12;
   tabla[nro_pagina] = entrada_a_la_tabla;
 
