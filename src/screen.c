@@ -109,11 +109,34 @@ void screen_inicializar() {
 	screen_pintar_rect(0, C_BG_BLUE, 45, 40, 5, 7); // barra de jugador azul
 }
 
-/*void screen_pintar_puntajes() {}
+void screen_pintar_puntajes() {}
+
+uint8_t screen_color_jugador(jugador_t *j) {
+	 if (j == NULL)
+        return C_FG_LIGHT_GREY;
+
+    if (j->index == INDICE_JUGADOR_A)
+        return C_FG_RED;
+    else
+        return C_FG_BLUE;
+	}
+	
+void screen_pintar_pirata(jugador_t *j, pirata_t *pirata) {
+	uint8_t c     = screen_caracter_pirata(pirata->tipo);
+    uint8_t color = C_MAKE_BG(screen_color_jugador(pirata->jugador)) | C_FG_WHITE;
+
+    screen_pintar(c, color, pirata->y+1, pirata->x);
+	}
+	
+uint8_t screen_caracter_pirata(uint32_t tipo) {
+	if (tipo == TIPO_EXPLORADOR) return '1';
+    if (tipo == TIPO_MINERO) return '2';
+    while(1){};
+    return '?';
+	}
+
+/*
 void screen_actualizar_reloj_pirata (jugador_t *j, pirata_t *pirata) {}
-uint8_t screen_color_jugador(jugador_t *j) {}
-uint8_t screen_caracter_pirata(unsigned int32_t tipo) {}
-void screen_pintar_pirata(jugador_t *j, pirata_t *pirata) {}
 void screen_borrar_pirata(jugador_t *j, pirata_t *pirata) {}
 void screen_pintar_reloj_pirata(jugador_t *j, pirata_t *pirata) {}
 void screen_pintar_reloj_piratas(jugador_t *j) {}

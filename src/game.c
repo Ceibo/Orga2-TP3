@@ -45,9 +45,17 @@ uint32_t  game_posicion_valida(int x, int y) {
 	return (x >= 0 && y >= 0 && x < MAPA_ANCHO && y < MAPA_ALTO);
 }
 
-pirata_t* id_pirata2pirata(uint32_t  id_pirata)
+pirata_t* id_pirata2pirata(uint32_t  id)//completado por alumno
 {
-    // ~ completar ~
+    
+    for(int i = 0;i < MAX_CANT_PIRATAS_VIVOS; i++){//iteramos sobre los piratas de ambos jugadores
+		if(jugadorA.piratas[i].id == id){
+			return &(jugadorA.piratas[i]);
+		}
+		if(jugadorB.piratas[i].id == id){
+			return &(jugadorB.piratas[i]);
+		}
+	}
 	return NULL;
 }
 
@@ -76,7 +84,8 @@ uint32_t  game_valor_tesoro(uint32_t  x, uint32_t  y)
 	return 0;
 }
 
-// dada una posicion (x,y) guarda las posiciones de alrededor en dos arreglos, uno para las x y otro para las y
+// dada una posicion (x,y) guarda las posiciones de alrededor en dos arreglos, 
+//uno para las x y otro para las y
 void game_calcular_posiciones_vistas(int *vistas_x, int *vistas_y, int x, int y)
 {
 	int next = 0;
@@ -93,13 +102,46 @@ void game_calcular_posiciones_vistas(int *vistas_x, int *vistas_y, int x, int y)
 }
 
 
-void game_inicializar() {
-  // Código de prueba, borrar después
-  lcr3((uint32_t) mmu_inicializar_dir_pirata(0x10000, 0x500000 + game_xy2lineal(1, 1)*0x1000, INDICE_JUGADOR_A));
+void game_inicializar()//*************** agregado ************
+{
+	game_jugador_inicializar(&jugadorA);
+	game_jugador_inicializar(&jugadorB);
+
+    screen_pintar_puntajes();
 }
 
 void game_jugador_inicializar_mapa(jugador_t *jug)
 {
+if(jug == 0)
+	return;
+	
+	 // Para que todos los piratas de cada jugador compartan el mismo mapa
+  // y puedan así visualizar las áreas exploradas por los otros automáticamente
+  //una tabla por cada Indice requerido para mapear todas las posiciones de mapa (Indice 2,3,4,5)
+if(jug->index == INDICE_JUGADOR_A){
+  tabla_de_paginas_del_mapa_del_jugador_A_2 = (page_table_entry*) mmu_direccion_fisica_de_la_proxima_pagina_libre();
+  tabla_de_paginas_del_mapa_del_jugador_A_3 = (page_table_entry*) mmu_direccion_fisica_de_la_proxima_pagina_libre();
+  tabla_de_paginas_del_mapa_del_jugador_A_4 = (page_table_entry*) mmu_direccion_fisica_de_la_proxima_pagina_libre();
+  tabla_de_paginas_del_mapa_del_jugador_A_5 = (page_table_entry*) mmu_direccion_fisica_de_la_proxima_pagina_libre();
+} else {
+  tabla_de_paginas_del_mapa_del_jugador_B_2 = (page_table_entry*) mmu_direccion_fisica_de_la_proxima_pagina_libre();
+  tabla_de_paginas_del_mapa_del_jugador_B_3 = (page_table_entry*) mmu_direccion_fisica_de_la_proxima_pagina_libre();
+  tabla_de_paginas_del_mapa_del_jugador_B_4 = (page_table_entry*) mmu_direccion_fisica_de_la_proxima_pagina_libre();
+  tabla_de_paginas_del_mapa_del_jugador_B_5 = (page_table_entry*) mmu_direccion_fisica_de_la_proxima_pagina_libre();
+}
+  page_table_entry entrada = crear_entrada_nula_de_tabla_de_paginas();
+  //inicializamos las entradas de las tablas con valores nulos
+if(jug->index == INDICE_JUGADOR_A){
+  llenar_tabla_de_paginas(tabla_de_paginas_del_mapa_del_jugador_A_2, entrada, FALSE);
+  llenar_tabla_de_paginas(tabla_de_paginas_del_mapa_del_jugador_A_3, entrada, FALSE);
+  llenar_tabla_de_paginas(tabla_de_paginas_del_mapa_del_jugador_A_4, entrada, FALSE);
+  llenar_tabla_de_paginas(tabla_de_paginas_del_mapa_del_jugador_A_5, entrada, FALSE);
+}else{
+  llenar_tabla_de_paginas(tabla_de_paginas_del_mapa_del_jugador_B_2, entrada, FALSE);
+  llenar_tabla_de_paginas(tabla_de_paginas_del_mapa_del_jugador_B_3, entrada, FALSE);
+  llenar_tabla_de_paginas(tabla_de_paginas_del_mapa_del_jugador_B_4, entrada, FALSE);
+  llenar_tabla_de_paginas(tabla_de_paginas_del_mapa_del_jugador_B_5, entrada, FALSE);
+}
 }
 
 void game_jugador_inicializar(jugador_t *j)
@@ -107,12 +149,38 @@ void game_jugador_inicializar(jugador_t *j)
 	static int index = 0;
 
 	j->index = index++;
-    // ~ completar ~
+    
+    //**************** agregado *************//
+
+	if (j->index == INDICE_JUGADOR_A) {
+		j->x_puerto = POS_INIT_A_X;
+		j->y_puerto = POS_INIT_A_Y;
+
+	} else {
+		j->x_puerto = POS_INIT_B_X;
+		j->y_puerto = POS_INIT_B_Y;
+	}
+
+	j->puntos = 0;
+
+
+	int i;
+	for (i = 0; i < MAX_CANT_PIRATAS_VIVOS; i++)
+	{
+		uint32_t gdt_index = 0; // CAMBIAR POR ALGO VALIDO
+		game_pirata_inicializar(&j->piratas[i], j, i, gdt_index + i*8);
+	}
 
 }
-
+// realiza inicialización básica de un pirata. El pirata aun no está vivo ni por lanzarse. Setea jugador, indice, etc
 void game_pirata_inicializar(pirata_t *pirata, jugador_t *j, uint32_t  index, uint32_t  id)
 {
+	//***************** agregado *************************//
+	pirata->id   = id;
+    pirata->index = index;
+    pirata->jugador = j;
+	pirata->libre = TRUE;
+
 }
 
 void game_tick(uint32_t  id_pirata) {
@@ -120,9 +188,30 @@ void game_tick(uint32_t  id_pirata) {
   // Falta actualizar el reloj del pirata
 }
 
+// toma un pirata ya existente libre y lo recicla seteando x e y al puerto.
+// luego inicializa su mapeo de memoria, tss, lo agrega al sched y pinta la pantalla
 
 void game_pirata_relanzar(pirata_t *pirata, jugador_t *j, uint32_t  tipo)
-{
+{//******** hecho por alumno ***************
+	
+
+	pirata->x = j->x_puerto;
+	pirata->y = j->y_puerto;
+	pirata->tipo = tipo;
+	pirata->libre = FALSE;
+
+	// ahora debo llamar a rutinas que inicialicen un nuevo mapa de
+	// memoria para el nuevo pirata, que carguen su tss correspondiente,
+	// lo scheduleen y finalmente lo pinten en pantalla
+	uint32_t dest = desplazamiento_para_calcular_la_direccion_de_la_pagina_en_el_mapa(pirata->x,pirata->y);
+    //inicializamos tss de pirata
+    tss_libre(pirata->index,j->index, dest, pirata->id);
+    //inicializamos descriptor en gdt de tss (temporario)
+	inic_descriptor_tss(15);
+	//pintamos
+	screen_pintar_pirata(j, pirata);
+
+	//listo para usar (temporario)
 }
 
 pirata_t* game_jugador_erigir_pirata(jugador_t *j, uint32_t  tipo)
@@ -132,9 +221,31 @@ pirata_t* game_jugador_erigir_pirata(jugador_t *j, uint32_t  tipo)
 	return NULL;
 }
 
+//*********** agregado ************
+// debe devolver el proximo pirata del arreglo que no esté siendo usado actualmente
+pirata_t* game_jugador_dame_pirata_libre(jugador_t *j)
+{
+	int i;
+
+	for (i = 0; i < MAX_CANT_PIRATAS_VIVOS; i++)
+	{
+		if (j->piratas[i].libre == TRUE)
+			return &j->piratas[i];
+	}
+
+	return NULL;
+}
 
 void game_jugador_lanzar_pirata(jugador_t *j, uint32_t  tipo, int x, int y)
-{
+{ //********** hecho por alumno *************//
+	if (game_pirata_en_posicion(x,y) != NULL)
+		return;
+
+	pirata_t *pirata = game_jugador_dame_pirata_libre(j);
+	if (pirata == NULL)
+		return;
+
+	game_pirata_relanzar(pirata,j, tipo);
 }
 
 void game_pirata_habilitar_posicion(jugador_t *j, pirata_t *pirata, int x, int y)
@@ -149,8 +260,49 @@ void game_explorar_posicion(jugador_t *jugador, int c, int f)
 
 uint32_t  game_syscall_pirata_mover(uint32_t  id, direccion dir)
 {
-    // ~ completar
-    return 0;
+	//si es posible copiar cOdigo de tarea a nueva posiciOn,si es explorador
+	// mapear nueva posiciOn y alrededores. si hay botIn en nueva posiciOn crear minero
+	//pasando posiciOn a tarea minero. si no hay lugar para nueva tarea setear indicador de
+	//que hay minero esperando para avisar a scheduler.
+	//chequear que no se salga del mapa y si es minero no mapear nada.
+    //con el id ubico al pirata en estructura de jugador
+    
+    pirata_t * morgan = id_pirata2pirata(id); 
+    jugador_t * j = morgan->jugador;
+	int x,y;
+	//calculamos incrementos de coordenadas
+	uint32_t res =  game_dir2xy(dir, &x, &y); 
+	//si res == 0 matar tarea
+	if(res == 0)
+		return res;
+		
+	//actualizamos coordenadas pirata
+	int nuevo_x = morgan->x + x;//x e y tienen offset en mapa 
+	int nuevo_y = morgan->y + y;
+	//chequeamos  que la posiciOn nueva estE en mapa
+	if(game_posicion_valida(nuevo_x,nuevo_y)){
+		    //game_calcular_posiciones_vistas(morgan->vistas_x,morgan->vistas_y,nuevo_x,nuevo_y);
+			//mover y verificar si hay botin
+			//mapeamos todas las posiciones alrededor
+  			//debemos actualizar posiciOn en estructura pirata antes de invocar mmu_mover_pirata ***
+	     
+	     //obtenemos anterior posiciOn de pirata
+	     uint32_t viejo_x = morgan->x;
+	     uint32_t viejo_y = morgan->y;
+	     //actualizamos posiciOn de pirata
+	     morgan->x = (uint32_t ) nuevo_x;
+	     morgan->y = (uint32_t ) nuevo_y;
+	     //copiamos a nueva posiciOn, mapeamos alrededor.
+	     mmu_mover_pirata(morgan, viejo_x, viejo_y);
+		 //pintamos en pantalla al pirata
+		 screen_pintar_pirata(j,morgan);
+	     
+	}else{
+			//matar tarea
+			res = 0;
+	}
+		 
+    return res;//si res == 0 se debe matar tarea (argumentos de syscall invAlidos)
 }
 
 uint32_t  game_syscall_cavar(uint32_t  id)
@@ -224,3 +376,26 @@ void game_atender_teclado(uint8_t tecla)//(5)
 		default: break;
 	}
 }
+
+//dada un id de pirata devuelve la direcciOn del origen de cOdigo del pirata
+uint32_t dir_code_x_tipo_pirata(uint32_t id){
+	 uint32_t res;
+	 if(id_pirata2pirata(id)->tipo == TIPO_EXPLORADOR && 
+	 id_pirata2pirata(id)->jugador->index == INDICE_JUGADOR_A){
+		 res = TAREA_A_E;
+	 }
+	 if(id_pirata2pirata(id)->tipo == TIPO_MINERO && 
+	 id_pirata2pirata(id)->jugador->index == INDICE_JUGADOR_A){
+		 res = TAREA_A_M;
+	 }
+	 if(id_pirata2pirata(id)->tipo == TIPO_EXPLORADOR && 
+	 id_pirata2pirata(id)->jugador->index == INDICE_JUGADOR_B){
+		 res = TAREA_B_E;
+	 }
+	 if(id_pirata2pirata(id)->tipo == TIPO_MINERO && 
+	 id_pirata2pirata(id)->jugador->index == INDICE_JUGADOR_B){
+		 res = TAREA_B_M;
+	 }
+	 return res;
+}
+

@@ -5,6 +5,7 @@
   definicion de funciones del manejador de memoria
 */
 
+#include "game.h"
 #include "mmu.h"
 #include "i386.h"
 /* Atributos paginas */
@@ -22,13 +23,6 @@
 void mmu_inicializar() {
   proxima_pagina_libre = (void*) INICIO_PAGINAS_LIBRES;
 
-  // Para que todos los piratas de cada jugador compartan el mismo mapa
-  // y puedan así visualizar las áreas exploradas por los otros automáticamente
-  tabla_de_paginas_del_mapa_del_jugador_A = (page_table_entry*) mmu_direccion_fisica_de_la_proxima_pagina_libre();
-  tabla_de_paginas_del_mapa_del_jugador_B = (page_table_entry*) mmu_direccion_fisica_de_la_proxima_pagina_libre();
-  page_table_entry entrada = crear_entrada_nula_de_tabla_de_paginas();
-  llenar_tabla_de_paginas(tabla_de_paginas_del_mapa_del_jugador_A, entrada, FALSE);
-  llenar_tabla_de_paginas(tabla_de_paginas_del_mapa_del_jugador_B, entrada, FALSE);
 }
 
 void mmu_inicializar_dir_kernel() {
@@ -39,26 +33,29 @@ void mmu_inicializar_dir_kernel() {
 }
 
 page_directory_entry* mmu_inicializar_dir_pirata(uint32_t direccion_fisica_de_origen_del_codigo,
-    uint32_t direccion_fisica_de_destino_del_codigo, uint32_t indice_del_jugador) {
+    uint32_t direccion_fisica_de_destino_del_codigo, uint32_t indice_del_jugador,uint32_t id) {
   page_directory_entry* directorio = (page_directory_entry*) mmu_direccion_fisica_de_la_proxima_pagina_libre();
 
   // En todos los directorios se mapea la zona del kernel:
   mapear_paginas_de_kernel(directorio);
 
   // Se mapean las 9 páginas correspondientes al área inicial de 3x3 del jugador en el mapa:
-  page_table_entry* tabla_del_mapa = indice_del_jugador == INDICE_JUGADOR_A ?
-      tabla_de_paginas_del_mapa_del_jugador_A : tabla_de_paginas_del_mapa_del_jugador_B;
-  mapear_paginas_matricialmente_contiguas(directorio, tabla_del_mapa, direccion_fisica_de_destino_del_codigo);
-
+  //si jugador A entonces tabla de Indice 2 de pde (inicio en esquina izquierda superior).
+  //si jugador B entonces tabla de Indice 5 de pde (inicio en esquina derecha inferior).
+ 
+  
+  mapear_paginas_matricialmente_contiguas(directorio, direccion_fisica_de_destino_del_codigo,id);
+  
+  
   // Se mapea el inicio virtual del código a la posición inicial del jugador en el mapa:
   mmu_mapear_pagina(DIRECCION_VIRTUAL_DE_INICIO_DE_TAREAS,
-      direccion_fisica_de_destino_del_codigo, directorio);
+      direccion_fisica_de_destino_del_codigo, directorio,0x3);//0x3 == r/w (bit 0), u (bit 1)
 
   // Se copia el código del origen a la posición inicial del jugador en el mapa:
   uint32_t* direccion_virtual_de_destino_del_codigo = (uint32_t*) DIRECCION_VIRTUAL_DE_INICIO_DE_TAREAS + 10 * PAGE_SIZE;
   page_directory_entry* directorio_actual = (page_directory_entry*) rcr3();
   mmu_mapear_pagina((uint32_t) direccion_virtual_de_destino_del_codigo,
-      direccion_fisica_de_destino_del_codigo, directorio_actual);
+      direccion_fisica_de_destino_del_codigo, directorio_actual,0x3);
   uint32_t* direccion_virtual_de_origen_del_codigo = (uint32_t*) direccion_fisica_de_origen_del_codigo; // Coinciden
   uint32_t i;
   const uint32_t cant_a_copiar = PAGE_SIZE >> 2; // si copiáramos con uint8_t no haría falta dividir por 4
@@ -71,20 +68,24 @@ page_directory_entry* mmu_inicializar_dir_pirata(uint32_t direccion_fisica_de_or
 }
 
 void mapear_paginas_matricialmente_contiguas(page_directory_entry* directorio,
-    page_table_entry* tabla_del_mapa, uint32_t direccion_fisica_de_la_posicion_actual_del_jugador) {
+                 uint32_t direccion_fisica_de_la_posicion_actual_del_jugador,
+    uint32_t id) {
   // Calcula la fila y columna del mapa a partir de la dirección física
   uint32_t posicion_lineal_en_la_matriz_del_mapa =
     (direccion_fisica_de_la_posicion_actual_del_jugador - MAPA_BASE_FISICA) / PAGE_SIZE;
   uint32_t x = posicion_lineal_en_la_matriz_del_mapa % MAPA_ANCHO;
   uint32_t y = (posicion_lineal_en_la_matriz_del_mapa - x) / MAPA_ANCHO;
-
+  uint32_t index_jugador = id_pirata2pirata(id)->jugador->index;
   int32_t i, j;
   uint32_t desplazamiento;
   for (i = -1; i <= 1; i++) {
     for (j = -1; j <= 1; j++) {
-      desplazamiento = desplazamiento_para_calcular_la_direccion_de_la_pagina_en_el_mapa(x + i, y + j);
-      mmu_mapear_pagina_especificando_direccion_de_tabla(
-          MAPA_BASE_VIRTUAL + desplazamiento, MAPA_BASE_FISICA + desplazamiento, directorio, tabla_del_mapa);
+		int a = x + i;  int b = y + j;
+		if(game_posicion_valida(a,b) ){//chequeamos que estEn dentro de mapa
+          desplazamiento = desplazamiento_para_calcular_la_direccion_de_la_pagina_en_el_mapa(x + i, y + j);
+          mmu_mapear_pagina_especificando_direccion_de_tabla(
+          MAPA_BASE_VIRTUAL + desplazamiento, MAPA_BASE_FISICA + desplazamiento, directorio, index_jugador);
+       }
     }
   }
 }
@@ -168,7 +169,7 @@ page_directory_entry crear_entrada_nula_de_directorio_de_paginas() {
 }
 
 void mmu_mapear_pagina(unsigned int direccion_virtual,
-    unsigned int direccion_fisica, page_directory_entry* directorio_de_paginas) {
+    unsigned int direccion_fisica, page_directory_entry* directorio_de_paginas, uint32_t att) {
   // Ambas direcciones deberían ser múltiplos de 0x1000
 
   unsigned int nro_tabla = direccion_virtual >> 22; // índice del directorio de páginas
@@ -186,39 +187,67 @@ void mmu_mapear_pagina(unsigned int direccion_virtual,
     llenar_tabla_de_paginas(tabla, entrada, FALSE);
     directorio_de_paginas[nro_tabla].base = ((unsigned int) tabla) >> 12;
     directorio_de_paginas[nro_tabla].p = 1; //pde presente
-    directorio_de_paginas[nro_tabla].rw = 1;//r/w pde
-  } else {
+    
+    directorio_de_paginas[nro_tabla].rw = att;
+    directorio_de_paginas[nro_tabla].us = att >>1;
+  } else { 
+	  //si ya estaba mapeada la pAgina se obtiene la direcciOn de esta
     tabla = (page_table_entry*) (directorio_de_paginas[nro_tabla].base << 12);
   }
 
   entrada.p = 1;
-  entrada.rw = 1;
+  entrada.rw = att;
+  entrada.us = att >> 1;
   entrada.base = direccion_fisica >> 12;
+  //se pisa la anterior entrada en caso de misma direcciOn de origen (mover cOdigo)
   tabla[nro_pagina] = entrada;
 
   tlbflush();
 }
 
 void mmu_mapear_pagina_especificando_direccion_de_tabla(unsigned int direccion_virtual,
-    unsigned int direccion_fisica, page_directory_entry* directorio_de_paginas, page_table_entry* tabla) {
+    unsigned int direccion_fisica, page_directory_entry* directorio_de_paginas, 
+    uint32_t index_jugador) {
   // Ambas direcciones deberían ser múltiplos de 0x1000
 
   unsigned int nro_tabla = direccion_virtual >> 22; // índice del directorio de páginas
   unsigned int nro_pagina = (direccion_virtual << 10) >> 22; // índice de la tabla de páginas
   // unsigned int nro_linea = (direccion_virtual << 20) >> 20; // offset en la mem. física
-
-  // Esta implementación asume que el directorio existe de acuerdo a la clase
-  // de MMU de Lautaro Petaccio. Revisar.
-
+  page_table_entry * tabla;
+  // Esta implementación asume que el directorio existe
+  // de acuerdo al Indice en el directorio y al index jugador usamos las pAginas para mapa read only
+  if(index_jugador == INDICE_JUGADOR_A){
+	  if(nro_tabla == 2)
+		   tabla = tabla_de_paginas_del_mapa_del_jugador_A_2;
+	  if(nro_tabla == 3)
+	       tabla = tabla_de_paginas_del_mapa_del_jugador_A_3;
+      if(nro_tabla == 4)
+	       tabla = tabla_de_paginas_del_mapa_del_jugador_A_4;
+	  if(nro_tabla == 5)
+	       tabla = tabla_de_paginas_del_mapa_del_jugador_A_5;
+  }
+   if(index_jugador == INDICE_JUGADOR_B){
+	  if(nro_tabla == 2)
+		   tabla = tabla_de_paginas_del_mapa_del_jugador_B_2;
+	  if(nro_tabla == 3)
+	       tabla = tabla_de_paginas_del_mapa_del_jugador_B_3;
+      if(nro_tabla == 4)
+	       tabla = tabla_de_paginas_del_mapa_del_jugador_B_4;
+	  if(nro_tabla == 5)
+	       tabla = tabla_de_paginas_del_mapa_del_jugador_B_5;
+  }
+	
   page_directory_entry entrada_al_directorio = crear_entrada_nula_de_directorio_de_paginas();
   entrada_al_directorio.base = ((unsigned int) tabla) >> 12;
   entrada_al_directorio.p = 1;
-  entrada_al_directorio.rw = 1;
+  entrada_al_directorio.rw = 0;
+  entrada_al_directorio.us = 1; //user
   directorio_de_paginas[nro_tabla] = entrada_al_directorio;
 
   page_table_entry entrada_a_la_tabla = crear_entrada_nula_de_tabla_de_paginas();
   entrada_a_la_tabla.p = 1;
-  entrada_a_la_tabla.rw = 0; // 0 = read-only; 1 = read/write
+  entrada_a_la_tabla.rw = 0; // 0 = read-only; 
+  entrada_a_la_tabla.us = 1; //user
   entrada_a_la_tabla.base = direccion_fisica >> 12;
   tabla[nro_pagina] = entrada_a_la_tabla;
 
@@ -235,3 +264,49 @@ void mmu_desmapear_pagina(unsigned int direccion_virtual,
   
   tlbflush();
 }
+//**************** agregada *******************
+// debe remapear y copiar el codigo
+void mmu_mover_pirata(pirata_t *pirata, int viejo_x, int viejo_y){
+	//necesitamos viejo_x y viejo_y para trasladar el cOdigo y pila de anterior posiciOn
+	
+	// Se mapea el inicio virtual del código a la posición del jugador en el mapa:
+	
+  uint32_t nuevo_x = pirata->x;
+  uint32_t nuevo_y = pirata->y;
+  uint32_t id = pirata->id;
+  uint32_t desp = desplazamiento_para_calcular_la_direccion_de_la_pagina_en_el_mapa(nuevo_x,nuevo_y);
+  //obtenemos dir fIsica de nueva ubicaciOn en el mapa 
+  unsigned int direccion_fisica_de_destino_del_codigo = MAPA_BASE_FISICA + desp;
+  //obtenemos directorio actual
+  page_directory_entry*  directorio = (page_directory_entry* ) rcr3(); 
+  //mapeamos a nueva posiciOn en mapa como user y rw
+  mmu_mapear_pagina(DIRECCION_VIRTUAL_DE_INICIO_DE_TAREAS,
+      direccion_fisica_de_destino_del_codigo, directorio,0x3);//0x3 == r/w (bit 0), u (bit 1)
+  
+  // Se copia el código del origen a la posición inicial del jugador en el mapa:
+ 
+  //mapeamos a anterior posiciOn sobre pAginas no usadas para no pisar nuevo mapeo y
+  //acceder a cOdigo y pila de anterior posiciOn
+  uint32_t* direccion_virtual_de_origen_del_codigo = (uint32_t*) DIRECCION_VIRTUAL_DE_INICIO_DE_TAREAS + 10 * PAGE_SIZE;
+  //calculamos antigua direcciOn fIsica de cOdigo y pila
+  desp = desplazamiento_para_calcular_la_direccion_de_la_pagina_en_el_mapa(viejo_x,viejo_y);
+  unsigned int direccion_fisica_de_origen_del_codigo = MAPA_BASE_FISICA + desp;
+  //mapeamos pAgina temporal a antigua direcciOn fIsica de cOdigo y pila
+  mmu_mapear_pagina((uint32_t) direccion_virtual_de_origen_del_codigo,
+      direccion_fisica_de_origen_del_codigo, directorio,0x3);
+  //calculamos direcciOn virtual de destino (nueva posiciOn, ya mapeada)
+    uint32_t* direccion_virtual_de_destino_del_codigo = (uint32_t*) DIRECCION_VIRTUAL_DE_INICIO_DE_TAREAS;
+  //copiamos a nueva posiciOn usando pAgina temporal (direccion_virtual_de_destino_del_codigo)
+   uint32_t i;
+  const uint32_t cant_a_copiar = PAGE_SIZE >> 2; //se copian de a 4 bytes, dividir por 4
+  for (i = 0; i < cant_a_copiar; i++) {
+    direccion_virtual_de_destino_del_codigo[i] = direccion_virtual_de_origen_del_codigo[i];
+  }
+  mmu_desmapear_pagina((uint32_t) direccion_virtual_de_origen_del_codigo, directorio);
+  
+  //mapeamos junto a posiciones de alrededor como read only si es posible:
+  
+  mapear_paginas_matricialmente_contiguas(directorio, direccion_fisica_de_destino_del_codigo,id);
+
+}
+

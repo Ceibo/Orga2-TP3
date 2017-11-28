@@ -102,10 +102,28 @@ _isr33:
 ;;
 ;; Rutinas de atención de las SYSCALLS
 global _isr46 ; (5)
-  
+extern game_syscall_pirata_mover
 _isr46:
-	call fin_intr_pic1; comunicamos al pic que ya se atendiO la interrupciOn permitiendo nuevas llamadas desde el dispositivo.
-	mov eax,0x00000042
+	 cmp eax,0x1
+	 je .mover
+	 cmp eax ,0x2
+	 je .cavar
+	 cmp eax ,0x3
+	 je .posicion
+	 ;jmp .desalojar; argumento invAlido
+	 
+.mover:
+	push ecx; direccion a mover
+	;invocar funciOn que devuelva id de pirata actual
+	push 0; 1er tarea
+	call game_syscall_pirata_mover
+	 
+.cavar:
+.posicion:
+	
+;.desalojar: ; dividir por 0 para que la excepciOn la mate
+.fin:
+	pop eax
 	iret;
 
 ;; -------------------------------------------------------------------------- ;;
