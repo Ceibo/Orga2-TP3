@@ -46,7 +46,7 @@ gdt_entry gdt[GDT_COUNT] = {
     },
  
     // Segmento para código de nivel cero (kernel)
-    [SEGMENTO_CODIGO_NIVEL_0] = (gdt_entry) {//8
+    [SEGMENTO_CODIGO_NIVEL_0] = (gdt_entry) { //8
         (uint16_t)    SEGMENT_LIMIT,
         (uint16_t)    0x0000,   // Base address 0:15
         (uint8_t)     0x00,     // Base address 16:23
@@ -63,7 +63,7 @@ gdt_entry gdt[GDT_COUNT] = {
     },
     
     // Segmento para datos de nivel cero (kernel)
-    [SEGMENTO_DATOS_NIVEL_0] = (gdt_entry) {//9
+    [SEGMENTO_DATOS_NIVEL_0] = (gdt_entry) { //9
         (uint16_t)    SEGMENT_LIMIT,
         (uint16_t)    0x0000,   // Base address 0:15
         (uint8_t)     0x00,     // Base address 16:23
@@ -80,7 +80,7 @@ gdt_entry gdt[GDT_COUNT] = {
     },
 
 	// Segmento para código de nivel tres
-    [SEGMENTO_CODIGO_NIVEL_3] = (gdt_entry) {//10
+    [SEGMENTO_CODIGO_NIVEL_3] = (gdt_entry) { //10
         (uint16_t)    SEGMENT_LIMIT,
         (uint16_t)    0x0000,   // Base address 0:15
         (uint8_t)     0x00,     // Base address 16:23
@@ -97,7 +97,7 @@ gdt_entry gdt[GDT_COUNT] = {
     },
 
 	// Segmento para datos de nivel tres
-    [SEGMENTO_DATOS_NIVEL_3] = (gdt_entry) {//11
+    [SEGMENTO_DATOS_NIVEL_3] = (gdt_entry) { //11
         (uint16_t)    SEGMENT_LIMIT,
         (uint16_t)    0x0000,   // Base address 0:15
         (uint8_t)     0x00,     // Base address 16:23
@@ -116,7 +116,7 @@ gdt_entry gdt[GDT_COUNT] = {
     // Segmento para la pantalla utilizado solo por el kernel
     #define VIDEO_SEGMENT_LIMIT 0x01F3F           // 20 bits         
     #define VIDEO_SEGMENT_BASE_ADDRESS 0x000B8000 // 32 bits
-    [SEGMENTO_PANTALLA] = (gdt_entry) {//12
+    [SEGMENTO_PANTALLA] = (gdt_entry) { //12
         (uint16_t)    VIDEO_SEGMENT_LIMIT,                // segment limit 0-15
         (uint16_t)    VIDEO_SEGMENT_BASE_ADDRESS,         // base address 0-15
         (uint8_t)     (VIDEO_SEGMENT_BASE_ADDRESS >> 16), // base address 16-23

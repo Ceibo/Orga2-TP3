@@ -1,13 +1,17 @@
-%Lorem ipsum dolor sit amet.
-\subsection{Global Descriptor Table}
-\subsubsection{Descriptores de código y datos}
-Antes de pasar a modo protegido creamos cuatro descriptores de segmento en la GDT. Como nos piden que dejemos lugar para 7 descriptores al comienzo de la tabla empezamos en índice 8, dejando libres índices desde 0 a 7.
-Los descriptores están dados por dos doble words (ver Figura 1), una doble word ocupa 32 bits, y se representan con estructuras llamadas \verb|str_gdt_entry|, donde cada campo de la estructura representa subconjunto de bits de cada una de las dos doble words. En lo que sigue nos referiremos a los bits de las doble words.\\
+\subsection{Ejercicio 1}
+\subsubsection{Ejercicio 1A}
+La tabla de descriptores globales (GDT) es un arreglo en memoria cuyas entradas (llamadas descriptores globales) ocupan 64 bits. Los distintos campos del descriptor se representan de acuerdo a la figura 1. Para poder ingresar los distintos valores en C utilizamos un struct con la representación empaquetada. Cada segmento de memoria debe tener su descriptor en la GDT. En este ejercicio creamos dos segmentos de código de nivel 0 y 3 y dos segmentos de datos de nivel 0 y 3.\newline
 \begin{figure}[h]
 \centering
 \includegraphics[scale=0.6] {descriptor_segmento}
-\caption{Descriptor de segmento (primera doble word abajo y segunda doble word arriba).}
-\end{figure} 
+\caption{Descriptor de segmento}
+\end{figure}
+\begin{itemize}
+	\item El base address es 0 porque todos los segmentos corresponden a los primeros 500 MB de la memoria.
+	\item La granularidad hace que el tamaño del segmento
+\end{itemize}
+
+
 
  Los descriptores de código, ubicados en índice 8 y 10 de tabla, se completan tal que los bits de $BASE$, que son los bits 16 a 31 de primer doble word junto a bits 0 a 7 y bits 24 a 31 de segunda doble, queden todos en 0. Esto a causa de que debemos direccionar los primeros 500 megabytes de memoria y por lo tanto la base de los segmentos es 0. Luego el límite debe indicar 500 megas y por lo tanto debemos setear el bit $G$, granularidad, que es el bit número 23 de segunda doble word. A causa de esto el límite tiene rango desde 4 Kbytes a 4 Gbytes. Entonces despejando de ecuación $Limite$ * \verb|0x400| + \verb|0x3FF| = 500 $megas$ se obtiene valor de  \verb|0x7CFFF|. Escribimos en bits 0 a 15 de primer doble word, campo de límite, el valor \verb|0xCFFF| y completamos el campo de límite escribiendo en los bits 16 a 19 de segunda doble word el valor \verb|0x7|. Luego seteamos los bits de tipo, bits 8 a 11 en segunda doble word, de manera que indique que el descriptor es de código y se permite ejecución y lectura. Esto se hace llenando esos bits con \verb|0xA|. Paso seguido seteamos bit $S$, bit 12 en segunda doble word, especificando que desciptor no es de sistema. Pasamos a bits 13 a 14 en segunda doble word, $DPL$, en donde establecemos privilegios. Acá llenamos con dos ceros en caso de descriptor de nivel 0 mientras que para descriptor de nivel 3 llenamos los bits con dos unos. Luego Seteamos bit $P$, número 15 en segunda doble word, tal que indique que el descriptor está presente, sino al buscar dirección no se encontraría el descriptor y se generaría una falta. Bits $AVL$ y $L$, bits 20 y 21 respectivamente de segunda doble word, se dejan en cero indicando no segmento de 64 bits. Finalmente bit $D/B$, bit 22 en segunda doble word, se setea indicando operaciones en 32 bits.\\
 \indent En los descriptores de datos todos los bits menos los de tipo se completan exactamente como completamos los de código, llenando los bits $DPL$ con ceros para segmento de datos nivel 0 y con unos para el de nivel 3. Los bits de tipo se llenan con \verb|0x2| tal que indican segmento de datos para lectura y escritura. Estos descriptores están en los índices 9 y 11 de tabla.\\
