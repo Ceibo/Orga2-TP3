@@ -100,6 +100,7 @@ void screen_entorno_pirata(uint8_t color, int32_t fila, int32_t columna, int32_t
 	for (i = fila; i < fila + alto; i++) {
 		for (j = columna; j < columna + ancho; j++) {
 			if(i < VIDEO_FILS && j < VIDEO_COLS){
+				screen_actualizar_posicion_mapa(j+1,i);
 			    letra = screen_valor_actual(i, j);
 			    if(letra == 0)//si no hay nada pisamos color anterior con color de jugador
 					color2 = color;
@@ -109,6 +110,7 @@ void screen_entorno_pirata(uint8_t color, int32_t fila, int32_t columna, int32_t
 			}
 		}
 	}
+
 }
 
 void screen_pintar_linea_h(uint8_t c, uint8_t color, int32_t fila, int32_t columna, int32_t ancho) {
@@ -145,10 +147,11 @@ void screen_pintar_pirata(jugador_t *j, pirata_t *pirata) {
 	uint8_t c     = screen_caracter_pirata(pirata->tipo);
     uint8_t color = C_MAKE_BG(screen_color_jugador(pirata->jugador)) | C_FG_WHITE;
     uint8_t color2 = C_MAKE_BG(screen_color_jugador(pirata->jugador));
-    
- 	screen_pintar(c, color, pirata->y+1, pirata->x);//y+1 porque en pantalla el mapa estA corrido +1 en y
+    screen_entorno_pirata(color2,pirata->y, pirata->x-1,3,3);//acomodamos grAfica de rectangulo   
 
-    screen_entorno_pirata(color2,pirata->y, pirata->x-1,3,3);//acomodamos grAfica de rectangulo (x-1)
+  	screen_pintar(c, color, pirata->y+1, pirata->x);//y+1 porque en pantalla el mapa estA corrido +1 en y
+
+
 	}
 	
 	
