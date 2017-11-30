@@ -33,15 +33,11 @@ void mmu_inicializar_dir_kernel() {
 }
 
 page_directory_entry* mmu_inicializar_dir_pirata(uint32_t direccion_fisica_de_origen_del_codigo,
-    uint32_t direccion_fisica_de_destino_del_codigo, uint32_t indice_del_jugador,uint32_t id) {
+    uint32_t direccion_fisica_de_destino_del_codigo, uint32_t id) {
   page_directory_entry* directorio = (page_directory_entry*) mmu_direccion_fisica_de_la_proxima_pagina_libre();
 
   // En todos los directorios se mapea la zona del kernel:
   mapear_paginas_de_kernel(directorio);
-
-  // Se mapean las 9 páginas correspondientes al área inicial de 3x3 del jugador en el mapa:
-  //si jugador A entonces tabla de Indice 2 de pde (inicio en esquina izquierda superior).
-  //si jugador B entonces tabla de Indice 5 de pde (inicio en esquina derecha inferior).
  
   
   mapear_paginas_matricialmente_contiguas(directorio, direccion_fisica_de_destino_del_codigo,id);
@@ -62,6 +58,7 @@ page_directory_entry* mmu_inicializar_dir_pirata(uint32_t direccion_fisica_de_or
   for (i = 0; i < cant_a_copiar; i++) {
     direccion_virtual_de_destino_del_codigo[i] = direccion_virtual_de_origen_del_codigo[i];
   }
+  
   mmu_desmapear_pagina((uint32_t) direccion_virtual_de_destino_del_codigo, directorio_actual);
 
   return directorio;
@@ -279,7 +276,7 @@ void mmu_mover_pirata(pirata_t *pirata, int viejo_x, int viejo_y){
   unsigned int direccion_fisica_de_destino_del_codigo = MAPA_BASE_FISICA + desp;
   //obtenemos directorio actual
   page_directory_entry*  directorio = (page_directory_entry* ) rcr3(); 
-  //mapeamos a nueva posiciOn en mapa como user y rw
+  //mapeamos a nueva posiciOn en mapa como user y rw:
   mmu_mapear_pagina(DIRECCION_VIRTUAL_DE_INICIO_DE_TAREAS,
       direccion_fisica_de_destino_del_codigo, directorio,0x3);//0x3 == r/w (bit 0), u (bit 1)
   
@@ -304,9 +301,9 @@ void mmu_mover_pirata(pirata_t *pirata, int viejo_x, int viejo_y){
   }
   mmu_desmapear_pagina((uint32_t) direccion_virtual_de_origen_del_codigo, directorio);
   
-  //mapeamos junto a posiciones de alrededor como read only si es posible:
-  
-  mapear_paginas_matricialmente_contiguas(directorio, direccion_fisica_de_destino_del_codigo,id);
+  //mapeamos posiciOn junto a posiciones de alrededor como read only si es posible (sOlo explorador):
+  if(pirata->tipo == TIPO_EXPLORADOR)
+     mapear_paginas_matricialmente_contiguas(directorio, direccion_fisica_de_destino_del_codigo,id);
 
 }
 

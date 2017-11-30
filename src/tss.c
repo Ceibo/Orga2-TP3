@@ -115,9 +115,9 @@ void tss_libre(int pirata, uint32_t jugador,   uint32_t dirFisDestinoCod, uint32
    //buscamos direcciOn de origen de cOdigo
    uint32_t origen = dir_code_x_tipo_pirata(id);
    
-   unsigned int reg_ctrl_3 = (unsigned int)mmu_inicializar_dir_pirata(origen,dirFisDestinoCod,jugador,id);
-   void* pila_0 = mmu_direccion_fisica_de_la_proxima_pagina_libre();//nueva pAgina con identity mapping
-   unsigned int  esp_0 = (unsigned int ) pila_0 + (PAGE_SIZE -1) ;//fin de pila 0
+   unsigned int reg_ctrl_3 = (unsigned int)mmu_inicializar_dir_pirata(origen,dirFisDestinoCod,id);
+   unsigned int pila_0 = (unsigned int ) mmu_direccion_fisica_de_la_proxima_pagina_libre();//nueva pAgina con identity mapping
+   unsigned int  esp_0 = (unsigned int ) pila_0 + (PAGE_SIZE) ;//fin de pila 0
    //ss0 : selector de segmento de pila de kernel porque la pAgina pedida para la pila estA en 
    // el area libre y se mapea con identity mapping (ver enunciado en pAgina 4 antes de scheduler)
 	 //eip: 0x400000, direcciOn virtual de cOdigo tarea
@@ -126,9 +126,10 @@ void tss_libre(int pirata, uint32_t jugador,   uint32_t dirFisDestinoCod, uint32
 	 // es,ss,ds,fs,gs : 0x005b (0000 0000 0101 1011)b , segmento datos nivel 3 en gdt
 	 //cs : 0x0053 (0000 0000 0101 0011)b; segmento cOdigo nivel 3 en gdt
   if(jugador == INDICE_JUGADOR_A){
-    TSS_ENTRY(tss_jugadorA[pirata],reg_ctrl_3,0x400000,0x400ff4,0x401000,0x005b,0x0053,0x005b,0x005b,0x005b,0x005b,esp_0,0x0048);    
+  //TSS_ENTRY(str,                 reg_ctrl_3,eip_reg ,esp_seg ,ebp_seg ,es_seg,cs_seg,ss_seg,ds_seg,fs_seg,gs_seg,esp0_dir,ss0_seg)         
+    TSS_ENTRY(tss_jugadorA[pirata],reg_ctrl_3,0x400000,0x400ff4,0x400ff4,0x005b,0x0053,0x005b,0x005b,0x005b,0x005b,esp_0,0x0048);    
  }else{
-    TSS_ENTRY(tss_jugadorB[pirata],reg_ctrl_3,0x400000,0x400ff4,0x401000,0x005b,0x0053,0x005b,0x005b,0x005b,0x005b,esp_0,0x0048);    
+    TSS_ENTRY(tss_jugadorB[pirata],reg_ctrl_3,0x400000,0x400ff4,0x400ff4,0x005b,0x0053,0x005b,0x005b,0x005b,0x005b,esp_0,0x0048);    
  }
 };
 

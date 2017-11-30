@@ -16,6 +16,7 @@ void task(int x, int y) {
 
     while(1)
     {
+		//breakpoint();// quitar **********
         int i;
         for (i = 0; i < restantex; i++)
             syscall_mover(DER);

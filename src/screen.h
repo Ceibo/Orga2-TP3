@@ -59,5 +59,13 @@ void clear_screen();
 
 void print_isr(int32_t i);
 void imprimir_nombre_de_grupo();
+uint8_t screen_valor_actual(uint32_t fila, uint32_t columna);
+//agregada
+//pinta el entorno del pirata (9 lugares en total si es posible)
+void screen_entorno_pirata(uint8_t color, int32_t fila, int32_t columna, int32_t alto, int32_t ancho);
+uint8_t screen_color_actual(uint32_t fila, uint32_t columna);
+//si hay mAs de 100 monedas entonces devuelve *, sino $.
+uint8_t screen_caracter_tesoro(uint32_t valor);
+
 
 #endif  /* !__SCREEN_H__ */

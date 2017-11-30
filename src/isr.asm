@@ -27,13 +27,14 @@ extern print_isr
 global _isr%1
 
 _isr%1:
+    xchg bx, bx; magic breakpoint ******
 
 	push %1
     call print_isr
     add esp, 4
 
     mov eax, %1
-    ;jmp $
+    jmp $
     iret
 
 %endmacro
@@ -103,7 +104,11 @@ _isr33:
 ;; Rutinas de atención de las SYSCALLS
 global _isr46 ; (5)
 extern game_syscall_pirata_mover
+extern game_pirata_exploto
 _isr46:
+	 ;xchg bx, bx; magic breakpoint ******
+
+	 pushad
 	 cmp eax,0x1
 	 je .mover
 	 cmp eax ,0x2
@@ -113,17 +118,30 @@ _isr46:
 	 ;jmp .desalojar; argumento invAlido
 	 
 .mover:
-	push ecx; direccion a mover
+ 	push ecx; direccion a mover : arriba, abajo, der, izq.
 	;invocar funciOn que devuelva id de pirata actual
-	push 0; 1er tarea
-	call game_syscall_pirata_mover
-	 
+	push 15; 1er tarea (temporal)
+	call game_syscall_pirata_mover;  retorna en eax : -1,0 o 1
+    add esp,8
+    cmp eax,0
+    je .fin; si eax = 0 entonces retornar 
+    cmp eax,-1
+    ;je .kill; si eax = -1 entonces matar tarea
+    ;cmp eax ,1
+    ;je .minero; si eax = 1 entonces switch a minero
+    jmp .fin
+    
 .cavar:
 .posicion:
-	
+.kill:
+     ;invocar funciOn que devuelva id de pirata actual
+	push 15;id
+	call game_pirata_exploto
+	jmp .fin
+.minero:
 ;.desalojar: ; dividir por 0 para que la excepciOn la mate
 .fin:
-	pop eax
+	popad
 	iret;
 
 ;; -------------------------------------------------------------------------- ;;

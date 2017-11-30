@@ -8,6 +8,7 @@
 #define __GAME_H__
 
 #include "defines.h"
+#include "i386.h"
 
 typedef enum direccion_e { ARR = 0x4, ABA = 0x7, DER = 0xA, IZQ = 0xD} direccion;
 
@@ -70,12 +71,14 @@ void game_pirata_erigir(pirata_t *pirata, jugador_t *j, uint32_t tipo);
 void game_pirata_habilitar_posicion(jugador_t *j, pirata_t *pirata, int32_t x, int32_t y);
 void game_pirata_exploto(uint32_t id);
 
-void game_jugador_inicializar(jugador_t *j);
+void game_jugador_inicializar(jugador_t *j,uint32_t i);
 void game_jugador_lanzar_pirata(jugador_t *j, uint32_t tipo, int32_t x, int32_t y);
 pirata_t* game_jugador_erigir_pirata(jugador_t *j, uint32_t tipo);
 void game_jugador_anotar_punto(jugador_t *j);
+//
 void game_explorar_posicion(jugador_t *jugador, int32_t x, int32_t y);
 
+//devuelve cantidad de monedas en posiciOn
 uint32_t game_valor_tesoro(uint32_t x, uint32_t y);
 void game_calcular_posiciones_vistas(int32_t *vistas_x, int32_t *vistas_y, int32_t x, int32_t y);
 pirata_t* game_pirata_en_posicion(uint32_t x, uint32_t y);
@@ -91,6 +94,14 @@ void game_atender_teclado(unsigned char tecla);
 uint32_t  game_posicion_valida(int x, int y);
 //aux *********** agregadas ************
 uint32_t dir_code_x_tipo_pirata(uint32_t id);
-pirata_t* game_jugador_dame_pirata_libre(jugador_t *j);
 
+//dada posiciOn actual devuelve direcciOn fIsica en mapa 
+ uint32_t dir_Fis_DestinoCod(uint32_t x, uint32_t y);
+
+pirata_t* game_jugador_dame_pirata_libre(jugador_t *j);
+void game_pirata_relanzar(pirata_t *pirata, jugador_t *j, uint32_t  tipo);
+
+// transforma código de dirección en valores x e y. en caso de Exito retorna 0
+// retorna -1 si no es posible 
+uint32_t  game_dir2xy(direccion dir, int *x, int *y);
 #endif  /* !__GAME_H__ */

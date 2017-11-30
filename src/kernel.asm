@@ -23,7 +23,7 @@ extern resetear_pic
 extern habilitar_pic
 extern inic_descriptor_tss
 
-;extern game_inicializar ; para probar, borrar después
+extern game_inicializar 
 
 ;; Saltear seccion de datos
 jmp start
@@ -36,6 +36,9 @@ iniciando_mr_len equ    $ - iniciando_mr_msg
 
 iniciando_mp_msg db     'Iniciando kernel (Modo Protegido)...'
 iniciando_mp_len equ    $ - iniciando_mp_msg
+
+offset  dd 0
+selector dw 0
 
 ;;
 ;; Seccion de código.
@@ -150,8 +153,15 @@ BITS 32
 	ltr ax; cargamos selector a descriptor de tss idle en registro tr
 	;xchg bx,bx ; magic breakpoint *******
 	
-	jmp 0x70:0; (0000 0000 0 1110 000)b ,Indice 14 ,salto a tarea idle
-
+	;jmp 0x70:0; (0000 0000 0 1110 000)b ,Indice 14 ,salto a tarea idle **** restaurar *****
+	
+	;saltamos a tarea pirata (test)   ******** quitar ********
+	call game_inicializar; inicializo jugadores,pirata
+	
+	xchg bx,bx ; magic breakpoint *******
+	mov word [selector],0x78; (0000 0000 0 1111 000)b , jmp a tarea 
+    jmp far [offset]
+	
 	
     ; Ciclar infinitamente (por si algo sale mal...)
     mov eax, 0xFFFF

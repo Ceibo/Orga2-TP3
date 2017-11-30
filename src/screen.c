@@ -37,6 +37,10 @@ uint8_t screen_valor_actual(uint32_t fila, uint32_t columna)
 {
     return p[fila][columna].c;
 }
+uint8_t screen_color_actual(uint32_t fila, uint32_t columna)
+{
+    return p[fila][columna].a;
+}
 
 void print(const char * text, uint32_t x, uint32_t y, uint16_t attr) {
     int32_t i;
@@ -86,7 +90,23 @@ void screen_pintar_rect(uint8_t c, uint8_t color, int32_t fila, int32_t columna,
 	uint32_t i, j;
 	for (i = fila; i < fila + alto; i++) {
 		for (j = columna; j < columna + ancho; j++) {
-			screen_pintar(c, color, i, j);
+ 			    screen_pintar(c, color, i, j);
+		}
+	}
+}
+
+void screen_entorno_pirata(uint8_t color, int32_t fila, int32_t columna, int32_t alto, int32_t ancho) {
+	uint32_t i, j;uint8_t letra; uint8_t  color2;
+	for (i = fila; i < fila + alto; i++) {
+		for (j = columna; j < columna + ancho; j++) {
+			if(i < VIDEO_FILS && j < VIDEO_COLS){
+			    letra = screen_valor_actual(i, j);
+			    if(letra == 0)//si no hay nada pisamos color anterior con color de jugador
+					color2 = color;
+				else
+			        color2 = (screen_color_actual(i,j) << 4)>> 4;//obtenemos color caracter
+			    screen_pintar(letra, color | color2, i, j);
+			}
 		}
 	}
 }
@@ -116,32 +136,74 @@ uint8_t screen_color_jugador(jugador_t *j) {
         return C_FG_LIGHT_GREY;
 
     if (j->index == INDICE_JUGADOR_A)
-        return C_FG_RED;
+        return C_FG_GREEN;
     else
-        return C_FG_BLUE;
+        return C_FG_LIGHT_BLUE;
 	}
 	
 void screen_pintar_pirata(jugador_t *j, pirata_t *pirata) {
 	uint8_t c     = screen_caracter_pirata(pirata->tipo);
     uint8_t color = C_MAKE_BG(screen_color_jugador(pirata->jugador)) | C_FG_WHITE;
+    uint8_t color2 = C_MAKE_BG(screen_color_jugador(pirata->jugador));
+    
+ 	screen_pintar(c, color, pirata->y+1, pirata->x);//y+1 porque en pantalla el mapa estA corrido +1 en y
 
-    screen_pintar(c, color, pirata->y+1, pirata->x);
+    screen_entorno_pirata(color2,pirata->y, pirata->x-1,3,3);//acomodamos grAfica de rectangulo (x-1)
 	}
 	
+	
 uint8_t screen_caracter_pirata(uint32_t tipo) {
-	if (tipo == TIPO_EXPLORADOR) return '1';
-    if (tipo == TIPO_MINERO) return '2';
+	if (tipo == TIPO_EXPLORADOR) return 'E';
+    if (tipo == TIPO_MINERO) return 'M';
     while(1){};
     return '?';
 	}
 
+ 
+
+void screen_actualizar_posicion_mapa(uint32_t x, uint32_t y) {
+	//color background celda
+	uint8_t bg = screen_color_actual(y+1,x) >> 4;
+
+    uint8_t letra;
+    uint32_t valor = game_valor_tesoro(x,y);
+    pirata_t *pirata = game_pirata_en_posicion(x, y);
+    if (pirata != NULL) {
+		if(!pirata->libre)//si pirata activo entonces conservamos su caracter
+        letra = screen_caracter_pirata(pirata->tipo);
+    }  else if (valor > 0) {//si hay tesoro lo mostramos
+        letra = screen_caracter_tesoro(valor);
+    } else if ((jugadorA.x_puerto == x && jugadorA.y_puerto == y) || (jugadorB.x_puerto == x && jugadorB.y_puerto == y))
+    {//si es puerto lo indicamos con 'x'
+        letra = 'x';
+    }
+    
+    
+    else
+    {
+        letra = screen_valor_actual(y+1, x);
+    }
+
+    screen_pintar(letra, C_MAKE_BG(bg) | C_FG_BLACK, y+1, x);
+	}
+	
+uint8_t screen_caracter_tesoro(uint32_t valor) {
+    if (valor > 100)
+        return '*';
+    else
+        return '$';
+}
+void screen_borrar_pirata(jugador_t *j, pirata_t *pirata) {
+	uint8_t bg = screen_color_actual( pirata->y+1,pirata->x);
+	screen_pintar('.', bg | C_FG_BLACK, pirata->y+1, pirata->x);
+    screen_actualizar_posicion_mapa(pirata->x, pirata->y);
+	}
+
 /*
 void screen_actualizar_reloj_pirata (jugador_t *j, pirata_t *pirata) {}
-void screen_borrar_pirata(jugador_t *j, pirata_t *pirata) {}
 void screen_pintar_reloj_pirata(jugador_t *j, pirata_t *pirata) {}
 void screen_pintar_reloj_piratas(jugador_t *j) {}
 void screen_pintar_relojes() {}
-void screen_actualizar_posicion_mapa(uint32_t x, uint32_t y) {}
 void screen_stop_game_show_winner(jugador_t *j) {}
 int32_t ee_printf(const char *fmt, ...) {}*/
 
