@@ -321,8 +321,11 @@ uint32_t  game_syscall_pirata_mover(uint32_t  id, direccion dir)
 			 int k;
 			 for(k = 0; k < 9; k++){
 				if(game_valor_tesoro(*j->vistas_x[k],*j->vistas_y[k])){
-					
-					res = 1;//llamar minero
+					//guardamos posiciOn de tesoro encontrado
+					morgan->tesoro_x = *j->vistas_x[k];
+					morgan->tesoro_y = *j->vistas_y[k];  
+					//llamamos minero
+					res = 1; 
 					break;
 				}
 			}
@@ -421,8 +424,7 @@ void game_atender_teclado(uint8_t tecla)//(5)
 	}
 }
 
-//dada un id de pirata devuelve la direcciOn del origen de cOdigo del pirata
-uint32_t dir_code_x_tipo_pirata(uint32_t id){
+ uint32_t dir_code_x_tipo_pirata(uint32_t id){
 	//hecha por alumno
 	 uint32_t res;
 	 if(id_pirata2pirata(id)->tipo == TIPO_EXPLORADOR && 
@@ -450,5 +452,13 @@ uint32_t dir_code_x_tipo_pirata(uint32_t id){
 	 uint32_t res = MAPA_BASE_FISICA + desp;
 	 return res;
  }
+ 
+uint32_t posiciOn_x_tesoro(uint32_t id){
+	return id_pirata2pirata(id)->tesoro_x;
+	}
+uint32_t posiciOn_y_tesoro(uint32_t id){
+	return id_pirata2pirata(id)->tesoro_y;
+	}
+
 
 

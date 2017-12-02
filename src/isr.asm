@@ -105,6 +105,10 @@ _isr33:
 global _isr46 ; (5)
 extern game_syscall_pirata_mover
 extern game_pirata_exploto
+extern posiciOn_x_tesoro
+extern posiciOn_y_tesoro
+extern sched_buscar_tarea_libre
+
 _isr46:
 	 ;xchg bx, bx; magic breakpoint ******
 
@@ -128,17 +132,42 @@ _isr46:
     cmp eax,-1
     ;je .kill; si eax = -1 entonces matar tarea
     ;cmp eax ,1
-    ;je .minero; si eax = 1 entonces switch a minero
+    je .minero; si eax = 1 entonces switch a minero
     jmp .fin
     
+.minero:
+	call sched_buscar_tarea_libre; eax contiene Indice en arreglo de scheduler de tarea libre
+	cmp eax,1000;  
+	;je .guardar_id_actual
+;si eax == 1000 entonces guardar posiciOn de tesoro descubierta 
+	;para cuando alguno se libere (Indice libre correspondiente a pirata asociado a jugador llamador)
+	;esto se almacena en array posiciones_tesoros correspondiente a jugador llamador en 
+	;estructura de scheduler. debe buscar posiciones en array con valores igual a 100.
+	; si no hay posiciones libres (con 100) se descartan.
+	
+;si eax != 1000 entonces eax tiene Indice vAlido en scheduler asociado a jugador llamador
+	;debo guardar en sched_task_t asociado a Indice la posiciOn de tesoro y setear 
+	;slot como resevado para minero.
+	
+	;invocar funciOn que devuelva id de pirata actual en eax
+	mov ebx,eax; ebx es copia de id (se mantiene por convenciOn c)
+	push ebx; 1er parAmetro posiciOn_x_tesoro
+	call posiciOn_x_tesoro; eax es posiciOn x de tesoro
+	mov esi, eax; esi es respaldo de posiciOn x de tesoro
+	add esp,4
+	push ebx; 1er parAmetro posiciOn_y_tesoro
+	call posiciOn_y_tesoro; eax es posiciOn y de tesoro
+	add esp,4
+    
 .cavar:
+	 
 .posicion:
 .kill:
      ;invocar funciOn que devuelva id de pirata actual
 	push 15;id
 	call game_pirata_exploto
 	jmp .fin
-.minero:
+
 ;.desalojar: ; dividir por 0 para que la excepciOn la mate
 .fin:
 	popad

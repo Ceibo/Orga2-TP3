@@ -96,11 +96,12 @@ void screen_pintar_rect(uint8_t c, uint8_t color, int32_t fila, int32_t columna,
 }
 
 void screen_entorno_pirata(uint8_t color, int32_t fila, int32_t columna, int32_t alto, int32_t ancho) {
+	//posiciOn no efectiva
 	uint32_t i, j;uint8_t letra; uint8_t  color2;
 	for (i = fila; i < fila + alto; i++) {
 		for (j = columna; j < columna + ancho; j++) {
 			if(i < VIDEO_FILS && j < VIDEO_COLS){
-				screen_actualizar_posicion_mapa(j+1,i);
+				screen_actualizar_posicion_mapa(j-1,i);//pasar posiciOn efectiva de columna , fila
 			    letra = screen_valor_actual(i, j);
 			    if(letra == 0)//si no hay nada pisamos color anterior con color de jugador
 					color2 = color;
@@ -147,7 +148,7 @@ void screen_pintar_pirata(jugador_t *j, pirata_t *pirata) {
 	uint8_t c     = screen_caracter_pirata(pirata->tipo);
     uint8_t color = C_MAKE_BG(screen_color_jugador(pirata->jugador)) | C_FG_WHITE;
     uint8_t color2 = C_MAKE_BG(screen_color_jugador(pirata->jugador));
-    screen_entorno_pirata(color2,pirata->y, pirata->x-1,3,3);//acomodamos grAfica de rectangulo   
+    screen_entorno_pirata(color2,pirata->y, pirata->x-1,3,3);//y es fila - x es columna - posiciOn no efectiva  
 
   	screen_pintar(c, color, pirata->y+1, pirata->x);//y+1 porque en pantalla el mapa estA corrido +1 en y
 
@@ -165,12 +166,12 @@ uint8_t screen_caracter_pirata(uint32_t tipo) {
  
 
 void screen_actualizar_posicion_mapa(uint32_t x, uint32_t y) {
-	//color background celda
-	uint8_t bg = screen_color_actual(y+1,x) >> 4;
+	//color background celda - recibe posiciOn efectiva - x es columna - y es fila
+	uint8_t bg = screen_color_actual(y+1,x) >> 4;//recibe fila ,columna no efectiva
 
     uint8_t letra;
-    uint32_t valor = game_valor_tesoro(x,y);
-    pirata_t *pirata = game_pirata_en_posicion(x, y);
+    uint32_t valor = game_valor_tesoro(x,y);//recibe posiciOn efectiva
+    pirata_t *pirata = game_pirata_en_posicion(x, y);//recibe posiciOn efectiva
     if (pirata != NULL) {
 		if(!pirata->libre)//si pirata activo entonces conservamos su caracter
         letra = screen_caracter_pirata(pirata->tipo);
@@ -184,7 +185,7 @@ void screen_actualizar_posicion_mapa(uint32_t x, uint32_t y) {
     
     else
     {
-        letra = screen_valor_actual(y+1, x);
+        letra = screen_valor_actual(y+1, x);//recibe fila, columna no efectiva
     }
 
     screen_pintar(letra, C_MAKE_BG(bg) | C_FG_BLACK, y+1, x);
@@ -199,7 +200,7 @@ uint8_t screen_caracter_tesoro(uint32_t valor) {
 void screen_borrar_pirata(jugador_t *j, pirata_t *pirata) {
 	uint8_t bg = screen_color_actual( pirata->y+1,pirata->x);
 	screen_pintar('.', bg | C_FG_BLACK, pirata->y+1, pirata->x);
-    screen_actualizar_posicion_mapa(pirata->x, pirata->y);
+    screen_actualizar_posicion_mapa(pirata->x, pirata->y);//posiciOn efectiva
 	}
 
 /*

@@ -32,8 +32,8 @@ typedef struct pirata_t
     uint32_t index;
     struct jugador_t *jugador;
     uint32_t libre; //libre: -true- slot disponible para lanzar tarea / -false- ya hay un tarea activa
-
-     
+	uint32_t tesoro_x;//posiciOn x de tesoro en caso de ser explorador
+    uint32_t tesoro_y;//posiciOn y de tesoro en caso de ser explorador
 	uint32_t x;//posiciOn (0 =< x =< 79)
 	uint32_t y;//posiciOn (0 =< y =< 43)
 	uint32_t id; //identifica unIvocamente al pirata (cada vez que se crea pirata se incrementa en 1)
@@ -93,6 +93,8 @@ void game_terminar_si_es_hora();
 void game_atender_teclado(unsigned char tecla);
 uint32_t  game_posicion_valida(int x, int y);
 //aux *********** agregadas ************
+
+//dada un id de pirata devuelve la direcciOn del origen de cOdigo del pirata
 uint32_t dir_code_x_tipo_pirata(uint32_t id);
 
 //dada posiciOn actual devuelve direcciOn fIsica en mapa 
@@ -104,4 +106,8 @@ void game_pirata_relanzar(pirata_t *pirata, jugador_t *j, uint32_t  tipo);
 // transforma código de dirección en valores x e y. en caso de Exito retorna 0
 // retorna -1 si no es posible 
 uint32_t  game_dir2xy(direccion dir, int *x, int *y);
+//devuelve posiciOn x de tesoro en mapa descubierto por pirata dado por id
+uint32_t posiciOn_x_tesoro(uint32_t id);
+//devuelve posiciOn y de tesoro en mapa descubierto por pirata dado por id
+uint32_t posiciOn_y_tesoro(uint32_t id);
 #endif  /* !__GAME_H__ */

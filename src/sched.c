@@ -24,8 +24,11 @@ int sched_buscar_indice_tarea(uint32_t gdt_index) {
 int sched_buscar_tarea_libre()
 {
 	int i = 0;
-
-    return i;
+    for(i = 0; i < MAX_CANT_TAREAS_VIVAS+1; i++){
+		if(scheduler.tasks[i].pirata->libre)
+			return i;
+    }
+    return 1000;
 }
 
 
