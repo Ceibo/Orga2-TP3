@@ -51,7 +51,7 @@
 gdt_entry gdt[GDT_COUNT] = {
     /* Descriptor nulo*/
     /* Offset = 0x00 */
-    [GDT_IDX_NULL_DESC] = (gdt_entry) {
+    [GDT_IDX_NULL_DESC] = (gdt_entry) {//tamaño 64 bits == 8 bytes
         (uint16_t)    0x0000,         /* limit[0:15]  */
         (uint16_t)    0x0000,         /* base[0:15]   */
         (uint8_t)     0x00,           /* base[23:16]  */
@@ -159,6 +159,7 @@ gdt_entry gdt[GDT_COUNT] = {
      //descriptor_tss  inicial en Indice 13
     //descriptor_tss idle en Indice 14
     //descriptores de tss libre empiezan en Indice 15 
+    //los de jugador A empiezan en Indice 15 y los de jugador B empiezan en Indice 23
      
 };
 

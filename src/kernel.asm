@@ -119,8 +119,7 @@ BITS 32
     or eax, 0x80000000
     mov cr0, eax
     
-    ;call game_inicializar ; para probar, borrar después
-
+ 
     ; Inicializar tss
     ; Inicializar tss de la tarea Idle(6)
     call tss_inicializar; inicializa tarea idle 
@@ -146,21 +145,21 @@ BITS 32
     
     ; Habilitar interrupciones(5)
     ; no hace falta sti, se setea en eflags de cada tarea
-    ;sti; seteamos if flag tal que interrupciones externas son posibles 
 
     ; Saltar a la primera tarea: Idle  (6)
 	mov ax,0x0068; (0000 0000 0 1101 000)b ,13, selector indiza a descriptor tss inicial en gdt (6)
-	ltr ax; cargamos selector a descriptor de tss idle en registro tr
+	ltr ax; cargamos selector a descriptor de tss inicial en registro tr
 	;xchg bx,bx ; magic breakpoint *******
-	
-	;jmp 0x70:0; (0000 0000 0 1110 000)b ,Indice 14 ,salto a tarea idle **** restaurar *****
-	
-	;saltamos a tarea pirata (test)   ******** quitar ********
-	call game_inicializar; inicializo jugadores,pirata
-	
+
+	call game_inicializar ; **** test *******
+     
+	jmp 0x70:0; (0000 0000 0 1110 000)b ,Indice 14 ,salto a tarea idle  
 	xchg bx,bx ; magic breakpoint *******
-	mov word [selector],0x78; (0000 0000 0 1111 000)b , jmp a tarea 
-    jmp far [offset]
+	;saltamos a tarea pirata (test)   ******** quitar ********
+	 
+	;xchg bx,bx ; magic breakpoint *******
+	;mov word [selector],0x78; (0000 0000 0 1111 000)b , jmp a tarea 
+    ;jmp far [offset]
 	
 	
     ; Ciclar infinitamente (por si algo sale mal...)

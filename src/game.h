@@ -9,6 +9,8 @@
 
 #include "defines.h"
 #include "i386.h"
+#include "tss.h"
+//#include "sched.h"
 
 typedef enum direccion_e { ARR = 0x4, ABA = 0x7, DER = 0xA, IZQ = 0xD} direccion;
 
@@ -28,16 +30,15 @@ typedef enum direccion_e { ARR = 0x4, ABA = 0x7, DER = 0xA, IZQ = 0xD} direccion
 struct jugador_t;
 
 typedef struct pirata_t
-{
-    uint32_t index;
+{	
+	uint16_t id; //es el Indice en la gdt del descriptor de su tss (no es selector de segmento)
+    uint32_t index;// valor entre 0 y 7 para indizar en array piratas de jugador
     struct jugador_t *jugador;
-    uint32_t libre; //libre: -true- slot disponible para lanzar tarea / -false- ya hay un tarea activa
-	uint32_t tesoro_x;//posiciOn x de tesoro en caso de ser explorador
-    uint32_t tesoro_y;//posiciOn y de tesoro en caso de ser explorador
-	uint32_t x;//posiciOn (0 =< x =< 79)
+    uint32_t libre; //libre: -1- slot disponible para lanzar tarea / -false- ya hay un tarea activa
+	//uint32_t tesoro_x;//posiciOn x de tesoro en caso de ser explorador
+    //uint32_t tesoro_y;//posiciOn y de tesoro en caso de ser explorador
+	uint32_t x;//posiciOn (0 =< x =< 79) - no consultar si estA libre
 	uint32_t y;//posiciOn (0 =< y =< 43)
-	uint32_t id; //identifica unIvocamente al pirata (cada vez que se crea pirata se incrementa en 1)
-	//es decir, se consulta id de tarea llamadora, se incrementa en 1 ese id y se asigna a nueva tarea
 	uint32_t tipo; //0 = explorador, 1 = minero
     // id unica, posicion, tipo, reloj
 } pirata_t;
@@ -45,13 +46,13 @@ typedef struct pirata_t
 
 typedef struct jugador_t
 {
-   uint32_t index;
+   uint32_t index;// 0 o 1
     pirata_t piratas[MAX_CANT_PIRATAS_VIVOS];
     //uint32_t x; //posiciOn jugador
     //uint32_t y; //posiciOn jugador
     // coordenadas puerto, posiciones exploradas, mineros pendientes, etc
-    int32_t *vistas_x[9]; //guarda las posiciones de entorno a donde se mueve. asocia x con y
-    int32_t *vistas_y[9];// ej: explorar (2,3) => vistas_x[i] = 2, vistas_y[i] = 3, 0 =< i =< 8.
+    int32_t vistas_x[9]; //guarda las posiciones de entorno a donde se mueve. asocia x con y
+    int32_t vistas_y[9];// ej: explorar (2,3) => vistas_x[i] = 2, vistas_y[i] = 3, 0 =< i =< 8.
     
 	 int32_t puntos;
 	 uint32_t x_puerto;//fila de puerto salida de pirata (0 =< x =< 79)
@@ -66,12 +67,12 @@ uint32_t game_xy2lineal(uint32_t x, uint32_t y);
 pirata_t* id_pirata2pirata(uint32_t id);
 
 // ~ auxiliares sugeridas o requeridas (segun disponga enunciado) ~
-void game_pirata_inicializar(pirata_t *pirata, jugador_t *jugador, uint32_t index, uint32_t id);
+void game_pirata_inicializar(pirata_t *pirata, jugador_t *jugador, uint32_t index, uint16_t id);
 void game_pirata_erigir(pirata_t *pirata, jugador_t *j, uint32_t tipo);
 void game_pirata_habilitar_posicion(jugador_t *j, pirata_t *pirata, int32_t x, int32_t y);
 void game_pirata_exploto(uint32_t id);
 
-void game_jugador_inicializar(jugador_t *j,uint32_t i);
+void game_jugador_inicializar(jugador_t *j);
 void game_jugador_lanzar_pirata(jugador_t *j, uint32_t tipo, int32_t x, int32_t y);
 pirata_t* game_jugador_erigir_pirata(jugador_t *j, uint32_t tipo);
 void game_jugador_anotar_punto(jugador_t *j);
@@ -88,7 +89,10 @@ uint32_t game_syscall_pirata_posicion(uint32_t id, int32_t idx);
 uint32_t game_syscall_pirata_mover(uint32_t id, direccion key);
 
 uint32_t game_syscall_manejar(uint32_t syscall, uint32_t param1);
-void game_tick(uint32_t id_pirata);
+
+// ~~~ debe atender la interrupción de reloj para actualizar la pantalla y terminar si es hora,
+// ~~~ recibe el pirata que está corriendo actualmente
+void game_tick(uint16_t id_pirata);
 void game_terminar_si_es_hora();
 void game_atender_teclado(unsigned char tecla);
 uint32_t  game_posicion_valida(int x, int y);
@@ -106,8 +110,8 @@ void game_pirata_relanzar(pirata_t *pirata, jugador_t *j, uint32_t  tipo);
 // transforma código de dirección en valores x e y. en caso de Exito retorna 0
 // retorna -1 si no es posible 
 uint32_t  game_dir2xy(direccion dir, int *x, int *y);
-//devuelve posiciOn x de tesoro en mapa descubierto por pirata dado por id
-uint32_t posiciOn_x_tesoro(uint32_t id);
-//devuelve posiciOn y de tesoro en mapa descubierto por pirata dado por id
-uint32_t posiciOn_y_tesoro(uint32_t id);
+//devuelve el id del pirata actual en el scheduler. si es la tarea idle se devuelve 0
+uint16_t game_id_pirata_actual();
+void game_calcular_pos_nuevas(int32_t * vistas_x,int32_t * vistas_y,int32_t nuevo_x, int32_t nuevo_y,int32_t x,int32_t y);
+
 #endif  /* !__GAME_H__ */

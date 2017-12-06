@@ -52,5 +52,5 @@ void idt_inicializar() {
     IDT_ENTRY(19,0);
     IDT_ENTRY(32,0); // gate reloj
     IDT_ENTRY(33,0); // gate teclado
-    IDT_ENTRY(46,3); //gate syscall (nivel 3 para poder ser accedido por tareas *chequeado*)
+    IDT_ENTRY(70,3); //gate syscall (nivel 3 para poder ser accedido por tareas *chequeado*)
 }

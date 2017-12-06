@@ -60,7 +60,7 @@ page_directory_entry* mmu_inicializar_dir_pirata(uint32_t direccion_fisica_de_or
   }
   
   mmu_desmapear_pagina((uint32_t) direccion_virtual_de_destino_del_codigo, directorio_actual);
-
+	//tlbflush();
   return directorio;
 }
 
@@ -79,6 +79,7 @@ void mapear_paginas_matricialmente_contiguas(page_directory_entry* directorio,
     for (j = -1; j <= 1; j++) {
 		int a = x + i;  int b = y + j;
 		if(game_posicion_valida(a,b) ){//chequeamos que estEn dentro de mapa
+		  //breakpoint();
           desplazamiento = desplazamiento_para_calcular_la_direccion_de_la_pagina_en_el_mapa(x + i, y + j);
           mmu_mapear_pagina_especificando_direccion_de_tabla(
           MAPA_BASE_VIRTUAL + desplazamiento, MAPA_BASE_FISICA + desplazamiento, directorio, index_jugador);

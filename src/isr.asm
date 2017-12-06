@@ -73,43 +73,69 @@ ISR 19
 ;; -------------------------------------------------------------------------- ;;
 
 global _isr32 ; (5)
-extern game_tick
+extern sched_atender_tick
  
 _isr32:
-	call fin_intr_pic1; comunicamos al pic que ya se atendiO la interrupciOn permitiendo nuevas llamadas desde el dispositivo.
-	call game_tick; rutina de reloj
+	pushad
+	;pushfd;agregado *****
+	call fin_intr_pic1; comunicamos al pic que ya se atendiO la interrupciOn permitiendo 
+	;nuevas llamadas desde el dispositivo.
+	;xchg bx, bx; magic breakpoint *****
+	call sched_atender_tick; rutina de sched-reloj , ax es selector a siguiente tarea
+	
+	str cx
+	cmp ax,cx; si siguiente es igual a actual no se switchea
+	je .fin
+	;xchg bx, bx; magic breakpoint *****
+	mov [sched_tarea_selector],ax
+	jmp far [sched_tarea_offset]
+	
+.fin:
+    ;popfd;agregado *****
+	popad
 	iret; retornamos de la interrupciOn habilitando interrupciones.
-	;mov eax, 32
-    ;jmp $
+	 
 
-;;
+
 ;; Rutina de atención del TECLADO
 ;; -------------------------------------------------------------------------- ;;
 ;BITS 32
 global _isr33 ; (5)
   
  extern game_atender_teclado
+  
 _isr33:
-	call fin_intr_pic1; comunicamos al pic que ya se atendiO la interrupciOn permitiendo nuevas llamadas desde el dispositivo.
-	 
-
-	push eax; guardamos registro
+	pushad
+	;pushfd;agregado *****
+	;nuevas llamadas desde el dispositivo.
+	xor eax,eax
 	in al,0x60; leemos teclado
+	;test al,10000000b
+	;jnz .fin; no hay informaciOn util. finalizamos
 	push eax; pasamos parAmetro a procedimiento siguiente
+	;xchg bx, bx; magic breakpoint *****
 	call game_atender_teclado; rutina de teclado
  	add esp,4
-	pop eax
+ 	call fin_intr_pic1; comunicamos al pic que ya se atendiO la interrupciOn permitiendo 
+
+.fin:
+    ;popfd;agregado *****
+	popad
 	iret;
-;;
+	
+ 
 ;; Rutinas de atención de las SYSCALLS
-global _isr46 ; (5)
+;;----------------------------------------------------------------------------------;;
+global _isr70 ; (5)
 extern game_syscall_pirata_mover
 extern game_pirata_exploto
-extern posiciOn_x_tesoro
-extern posiciOn_y_tesoro
-extern sched_buscar_tarea_libre
+;extern posiciOn_x_tesoro
+;extern posiciOn_y_tesoro
+;extern sched_buscar_tarea_libre
+extern game_id_pirata_actual
+extern game_syscall_pirata_posicion
 
-_isr46:
+_isr70:
 	 ;xchg bx, bx; magic breakpoint ******
 
 	 pushad
@@ -122,55 +148,54 @@ _isr46:
 	 ;jmp .desalojar; argumento invAlido
 	 
 .mover:
- 	push ecx; direccion a mover : arriba, abajo, der, izq.
-	;invocar funciOn que devuelva id de pirata actual
-	push 15; 1er tarea (temporal)
-	call game_syscall_pirata_mover;  retorna en eax : -1,0 o 1
+	mov ebx,ecx; backup direcciOn
+	call game_id_pirata_actual; ax tiene id de pirata actual
+	shl eax,16
+	shr eax,16; limpiamos word de arriba de eax
+ 	push ebx; direccion a mover : arriba, abajo, der, izq.	
+	push eax; id de pirata actual
+	call game_syscall_pirata_mover;  retorna en eax : -1,0
     add esp,8
-    cmp eax,0
-    je .fin; si eax = 0 entonces retornar 
-    cmp eax,-1
+    ;cmp eax,0
+    ;je .fin; si eax = 0 entonces retornar 
+    ;cmp eax,-1
     ;je .kill; si eax = -1 entonces matar tarea
-    ;cmp eax ,1
-    je .minero; si eax = 1 entonces switch a minero
     jmp .fin
-    
-.minero:
-	call sched_buscar_tarea_libre; eax contiene Indice en arreglo de scheduler de tarea libre
-	cmp eax,1000;  
-	;je .guardar_id_actual
-;si eax == 1000 entonces guardar posiciOn de tesoro descubierta 
-	;para cuando alguno se libere (Indice libre correspondiente a pirata asociado a jugador llamador)
-	;esto se almacena en array posiciones_tesoros correspondiente a jugador llamador en 
-	;estructura de scheduler. debe buscar posiciones en array con valores igual a 100.
-	; si no hay posiciones libres (con 100) se descartan.
-	
-;si eax != 1000 entonces eax tiene Indice vAlido en scheduler asociado a jugador llamador
-	;debo guardar en sched_task_t asociado a Indice la posiciOn de tesoro y setear 
-	;slot como resevado para minero.
-	
-	;invocar funciOn que devuelva id de pirata actual en eax
-	mov ebx,eax; ebx es copia de id (se mantiene por convenciOn c)
-	push ebx; 1er parAmetro posiciOn_x_tesoro
-	call posiciOn_x_tesoro; eax es posiciOn x de tesoro
-	mov esi, eax; esi es respaldo de posiciOn x de tesoro
-	add esp,4
-	push ebx; 1er parAmetro posiciOn_y_tesoro
-	call posiciOn_y_tesoro; eax es posiciOn y de tesoro
-	add esp,4
     
 .cavar:
 	 
 .posicion:
-.kill:
-     ;invocar funciOn que devuelva id de pirata actual
-	push 15;id
-	call game_pirata_exploto
-	jmp .fin
-
+    mov ebx,ecx; backup caso
+	call game_id_pirata_actual; ax tiene id de pirata actual
+	shl eax,16
+	shr eax,16; limpiamos word de arriba de eax
+ 	push ebx; caso a consultar	
+	push eax; id de pirata actual
+    call game_syscall_pirata_posicion; eax es posiciOn: 8 bits menos significativos son x,los siguientes son y
+	add esp,8
+	mov word [sched_tarea_selector],0x70; saltamos a la idle
+	jmp far [sched_tarea_offset]
+ 	pop edi
+ 	pop esi
+ 	pop ebp
+ 	add esp,4
+ 	pop ebx
+ 	pop edx
+ 	pop ecx
+ 	add esp,4; ignoramos eax guardada (ahI estA posiciOn)
+	iret;
+	
 ;.desalojar: ; dividir por 0 para que la excepciOn la mate
 .fin:
-	popad
+	;saltar a idle seteando parAmetro prox de scheduler con siguiente tarea de jugador contrario
+	;o en caso de no haber otro jugador la que siga (incluso la misma) tal que en prOxima
+	; interrupciOn de reloj al chequearse si current es 0 se usa ese prox para saltar a esa tarea
+    ; manteniendo la interrupciOn 0x46 transparente
+     
+	
+	mov word [sched_tarea_selector],0x70; saltamos a la idle
+	jmp far [sched_tarea_offset]
+ 	popad
 	iret;
 
 ;; -------------------------------------------------------------------------- ;;
