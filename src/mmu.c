@@ -175,7 +175,7 @@ void mmu_mapear_pagina(unsigned int direccion_virtual,
   // unsigned int nro_linea = (direccion_virtual << 20) >> 20; // offset en la mem. física
 
   // Esta implementación asume que el directorio existe de acuerdo a la clase
-  // de MMU de Lautaro Petaccio. Revisar.
+  // de MMU de Lautaro Petaccio.
 
   page_table_entry* tabla;
   page_table_entry entrada = crear_entrada_nula_de_tabla_de_paginas();
@@ -259,7 +259,21 @@ void mmu_desmapear_pagina(unsigned int direccion_virtual,
 
   page_table_entry* tabla = (page_table_entry*) (directorio_de_paginas[nro_tabla].base << 12);
   tabla[nro_pagina].p = 0;
+
+  uint32_t i = 0;
+  bool tabla_vacia = TRUE;
+  while (i < PAGE_ENTRIES_COUNT) {
+    if (tabla[i].p) {
+      tabla_vacia = FALSE;
+      break;
+    }
+    i++;
+  }
   
+  if (tabla_vacia) {
+    directorio_de_paginas[nro_tabla].p = 0;
+  }
+
   tlbflush();
 }
 //**************** agregada *******************

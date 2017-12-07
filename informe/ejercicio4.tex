@@ -1,0 +1,45 @@
+\subsection{Ejercicio 4}
+
+\subsubsection{Manejador de memoria}
+Tenemos un manejador de memoria al que le podemos pedir una página libre. El mecanismo es muy básico. Tenemos una variable inicializada en la posición física 0x100000. Cuando alguien llama a la función para pedir la dirección de una página libre, el manejador devuelve el valor de esta variable y luego la incrementa en 0x1000 que es el tamaño de una página, así en la próxima llamada a la función se devuelve la página que está inmediatamente más abajo, que se asume libre.\newline
+Con este mecanismo, si borramos una página física de todos los directorios la misma no podrá volver a ser asignada nuevamente, porque el manejador no se enterará que está libre, ya que la variable de la próxima página libre siempre crece.
+
+\subsubsection{Asignación de páginas}
+La función mmu\_mapear\_pagina se encarga de asignar un rango de direcciones de memoria virtual a memoria física en un directorio determinado, siendo ese rango el correspondiente a una página. Las direcciones físicas asignadas serán, por lo tanto, el rango [A, A+0x999] donde A es la dirección de comienzo de la página (múltiplo de 0x1000) y 0x999 es 0x1000 - 0x1. No se puede asignar un bloque de memoria menor a una página. Si una página no es suficiente, se puede llamar a esta función tantas veces como sea necesario con distinta páginas. Notar que no es necesario que las páginas físicas sean continuas, pues solo importa que las direcciones virtuales sean contiguas.\newline 
+Esta función, entonces, recibe los siguientes parámetros:
+\begin{itemize}
+\item Dirección física de comienzo de la página (múltiplo de 0x1000).
+\item Dirección virtual con la que se desea hacer la asignación.
+\item Dirección virtual del directorio de páginas en donde se desea hacer la asignación.
+\end{itemize}
+Pasos que realiza la función para hacer la asignación:
+\begin{itemize}
+\item Tomar los 10 bits más significativos de la dirección virtual que corresponden al número de tabla en el directorio de tablas.
+\item Tomar los 10 bits siguientes de la dirección virtual que correspondenal número de página en la tabla de páginas.
+\item Los 12 bits menos significativos corresponen al desplazamiento dentro de la página, que se usan en el mecanismo de paginación para poder acceder a direcciones particulares dentro de una página. En este caso los desestimamos porque siempre se asigna la página en bloque (solo necesitamos la dirección de comienzo).
+\item Si la entrada en el directorio de páginas correspondiente a la tabla (accedemos con el número de tabla calculado anteriormente) tiene el bit de presente activado, obtenemos la dirección de la tabla de páginas.
+\item Si no está presente, establecemos como dirección de tabla una dirección de página libre que le pedimos al manejador de memoria y activamos el bit de presente. Las 1024 entradas de esta nueva tabla las inicializamos vacías (en cero).
+\item Ahora que tenemos la dirección de la tabla, accedemos a la entrada correspondiente a la página utilizando el número de página calculado al comienzo y pisamos los siguientes valores: activamos bit de presente y ponemos como dirección base la dirección física de la página que recibimos como parámetro.
+\item Finalmente llamamos a una función para invalidar la cache de traducción de direcciones.
+\end{itemize}
+
+\subsubsection{Eliminación de páginas}
+La función mmu\_desmapear\_pagina se encarga de hacer que una página deje de pertenecer a un directorio determinado. Para hacer esto, simplemente separamos la dirección virtual en número de tabla y número de página como en la asignación, accedemos a la tabla desde el directorio y desactivamos el bit de presente de la página correspondiente desde la tabla. Adicionalmente, si detectamos que la tabla queda vacía (todas las entradas con el bit de presente desactivado), desactivamos el bit de presente de la tabla desde el directorio. Por último, llamamos a una función para invalidar la cache de traducción de direcciones.
+
+\subsubsection{Directorios de las tareas pirata}
+La función mmu\_inicializar\_dir\_pirata se encarga de crear el directorio para una tarea pirata.\newline
+Recibe como parámetros:
+\begin{itemize}
+\item Dirección física de la página donde se encuentra el código la tarea (se asume que entra en una sola página).
+\item Dirección física de destino del pirata (debería ser parte del mapa).
+\item ID del pirata.
+\end{itemize}
+Realiza los siguientes pasos:
+\begin{itemize}
+\item Pedir al manejador de memoria la dirección de una página libre que utilizaremos para el directorio.
+\item Asignar las páginas correspondientes a la zona del kernel en el nuevo directorio. Esto es para poder atender interrupciones.
+\item Asignar las páginas en posiciones matricialmente contiguas a la dirección de destino del código en el directorio actual pero usando una tabla de páginas compartida, lo cual hace que estas páginas sean visibles para todas las tareas automáticamente.
+\item Copiar el código del pirata de la dirección física de origen a la dirección física destino. Para hacer el copiado del código es necesario asignar una dirección virtual libre cualquiera que esté en la zona de kernel a la dirección física de destino del pirata y usar esta dirección temporal para copiar. Esto es necesario porque para hacer el copiado no usamos el nuevo directorio, sino el directorio actual, que puede pertenecer a otro pirata y si hacemos el copiado usando directamente la dirección virtual 0x400000 estaríamos perdiendo la asignación de ese posible pirata.
+\item Luego de hacer el copiado, eliminar esta página temporal del directorio actual y asignar la dirección 0x400000 en el nuevo directorio.
+\item Devolver la dirección física del directorio de páginas de la tarea.
+\end{itemize}
