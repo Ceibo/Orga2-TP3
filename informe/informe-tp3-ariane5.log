@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.9.27)  7 DEC 2017 08:34
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2017.9.27)  7 DEC 2017 14:50
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -491,10 +491,7 @@ Package: subfigure 2002/03/15 v2.1.5 subfigure package
 \subfig@top=\skip50
 \subfig@bottom=\skip51
 )
-(./informe-tp3-ariane5.aux
-LaTeX Info: Redefining \. on input line 6.
-LaTeX Info: Redefining \% on input line 6.
-)
+No file informe-tp3-ariane5.aux.
 \openout1 = `informe-tp3-ariane5.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 11.
@@ -511,7 +508,6 @@ LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 11.
 LaTeX Font Info:    ... okay on input line 11.
 LaTeX Info: Redefining \. on input line 11.
 LaTeX Info: Redefining \% on input line 11.
-
 (/usr/share/texlive/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count109
@@ -596,15 +592,27 @@ Underfull \hbox (badness 10000) in paragraph at lines 26--26
 [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map} <./logo_dc.jpg> <./logo_uba
-.jpg>] (./informe-tp3-ariane5.toc
-LaTeX Info: Redefining \. on input line 1.
-LaTeX Info: Redefining \% on input line 1.
-)
+.jpg>]
+No file informe-tp3-ariane5.toc.
 \tf@toc=\write3
 \openout3 = `informe-tp3-ariane5.toc'.
 
- [1] (./introduccion.tex) (./ejercicio1.tex <descriptor_segmento.png, id=19, 50
-1.875pt x 184.69pt>
+[1] (./introduccion.tex
+
+! Package inputenc Error: Unicode char ​ (U+200B)
+(inputenc)                not set up for use with LaTeX.
+
+See the inputenc package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.3 ...ivo que se ejecuta en modo privilegiado.​
+                                                  \newline
+Your command was ignored.
+Type  I <command> <return>  to replace it with another command,
+or  <return>  to continue without it.
+
+) (./ejercicio1.tex <descriptor_segmento.png, id=19, 501.875pt x 184.69pt>
 File: descriptor_segmento.png Graphic file (type png)
 
 <use descriptor_segmento.png>
@@ -623,10 +631,10 @@ LaTeX Info: Redefining \. on input line 6.
 LaTeX Info: Redefining \% on input line 6.
 ) ) 
 Here is how much of TeX's memory you used:
- 3560 strings out of 493029
- 46113 string characters out of 6136234
+ 3557 strings out of 493029
+ 46023 string characters out of 6136234
  121577 words of memory out of 5000000
- 7012 multiletter control sequences out of 15000+600000
+ 7013 multiletter control sequences out of 15000+600000
  6686 words of font info for 25 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  38i,8n,30p,1091b,384s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -639,7 +647,7 @@ t/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/
 type1/public/amsfonts/cm/cmss10.pfb></usr/share/texlive/texmf-dist/fonts/type1/
 public/amsfonts/cm/cmssbx10.pfb></usr/share/texlive/texmf-dist/fonts/type1/publ
 ic/amsfonts/cm/cmtt10.pfb>
-Output written on informe-tp3-ariane5.pdf (8 pages, 504631 bytes).
+Output written on informe-tp3-ariane5.pdf (8 pages, 504514 bytes).
 PDF statistics:
  70 PDF objects out of 1000 (max. 8388607)
  47 compressed objects within 1 object stream
