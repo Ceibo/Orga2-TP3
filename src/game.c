@@ -297,6 +297,9 @@ void game_jugador_lanzar_pirata(jugador_t *j, uint32_t  tipo, int x, int y)
 	if (game_pirata_en_posicion(x,y) != NULL)
 		return;
      **********************************************************************************/
+	//si estA en modo debug no lanzamos
+	if(pantalla_debug_activada)
+		return;
 	//si no hay slot en piratas de jugador no lanzamos
 	pirata_t *pirata = game_jugador_dame_pirata_libre(j);
 	if (pirata == NULL)
