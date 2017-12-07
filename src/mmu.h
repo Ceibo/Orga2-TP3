@@ -90,8 +90,7 @@ void mapear_paginas_matricialmente_contiguas(page_directory_entry* directorio,
                       uint32_t direccion_fisica_de_la_pagina,uint32_t id);
 void llenar_directorio(page_directory_entry* directorio);
 uint32_t desplazamiento_para_calcular_la_direccion_de_la_pagina_en_el_mapa(uint32_t x, uint32_t y);
-
-//*************** agregado *****************************
+ 
 // debe remapear y copiar el codigo
 void mmu_mover_pirata(pirata_t *pirata, int viejo_x, int viejo_y);
 

@@ -32,7 +32,7 @@ typedef struct sched_task_t
 	bool reservado_minero ;//si es 1 entonces scheduler debe inicializarlo como minero
 	//por medio de su id de pirata podemos averiguar a que jugador pertenece
 	bool reservado_explorador;//si es 1 entonces scheduler debe inicializarlo como explorador
-	uint32_t posiciOn_x_tesoro;//por default en 100
+	uint32_t posiciOn_x_tesoro;//posiciones a pasar al minero cuando se active. por default en 100
 	uint32_t posiciOn_y_tesoro;
  } sched_task_t;
 

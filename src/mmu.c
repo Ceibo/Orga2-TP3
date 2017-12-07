@@ -60,13 +60,12 @@ page_directory_entry* mmu_inicializar_dir_pirata(uint32_t direccion_fisica_de_or
   }
   
   mmu_desmapear_pagina((uint32_t) direccion_virtual_de_destino_del_codigo, directorio_actual);
-	//tlbflush();
+	 
   return directorio;
 }
 
 void mapear_paginas_matricialmente_contiguas(page_directory_entry* directorio,
-                 uint32_t direccion_fisica_de_la_posicion_actual_del_jugador,
-    uint32_t id) {
+                 uint32_t direccion_fisica_de_la_posicion_actual_del_jugador,uint32_t id) {
   // Calcula la fila y columna del mapa a partir de la dirección física
   uint32_t posicion_lineal_en_la_matriz_del_mapa =
     (direccion_fisica_de_la_posicion_actual_del_jugador - MAPA_BASE_FISICA) / PAGE_SIZE;
@@ -79,7 +78,7 @@ void mapear_paginas_matricialmente_contiguas(page_directory_entry* directorio,
     for (j = -1; j <= 1; j++) {
 		int a = x + i;  int b = y + j;
 		if(game_posicion_valida(a,b) ){//chequeamos que estEn dentro de mapa
-		  //breakpoint();
+		  
           desplazamiento = desplazamiento_para_calcular_la_direccion_de_la_pagina_en_el_mapa(x + i, y + j);
           mmu_mapear_pagina_especificando_direccion_de_tabla(
           MAPA_BASE_VIRTUAL + desplazamiento, MAPA_BASE_FISICA + desplazamiento, directorio, index_jugador);
@@ -173,9 +172,7 @@ void mmu_mapear_pagina(unsigned int direccion_virtual,
   unsigned int nro_tabla = direccion_virtual >> 22; // índice del directorio de páginas
   unsigned int nro_pagina = (direccion_virtual << 10) >> 22; // índice de la tabla de páginas
   // unsigned int nro_linea = (direccion_virtual << 20) >> 20; // offset en la mem. física
-
-  // Esta implementación asume que el directorio existe de acuerdo a la clase
-  // de MMU de Lautaro Petaccio.
+ 
 
   page_table_entry* tabla;
   page_table_entry entrada = crear_entrada_nula_de_tabla_de_paginas();
@@ -259,25 +256,10 @@ void mmu_desmapear_pagina(unsigned int direccion_virtual,
 
   page_table_entry* tabla = (page_table_entry*) (directorio_de_paginas[nro_tabla].base << 12);
   tabla[nro_pagina].p = 0;
-
-  uint32_t i = 0;
-  bool tabla_vacia = TRUE;
-  while (i < PAGE_ENTRIES_COUNT) {
-    if (tabla[i].p) {
-      tabla_vacia = FALSE;
-      break;
-    }
-    i++;
-  }
   
-  if (tabla_vacia) {
-    directorio_de_paginas[nro_tabla].p = 0;
-  }
-
   tlbflush();
 }
-//**************** agregada *******************
-// debe remapear y copiar el codigo
+ // debe remapear y copiar el codigo
 void mmu_mover_pirata(pirata_t *pirata, int viejo_x, int viejo_y){
 	//necesitamos viejo_x y viejo_y para trasladar el cOdigo y pila de anterior posiciOn
 	

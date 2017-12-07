@@ -131,7 +131,7 @@ void screen_entorno_pirata(uint8_t color, int32_t fila, int32_t columna, int32_t
 	for (i = fila; i < fila + alto; i++) {
 		for (j = columna; j < columna + ancho; j++) {
 			if(i < VIDEO_FILS && j < VIDEO_COLS){
-				//screen_actualizar_posicion_mapa(j-1,i);//pasar posiciOn efectiva de columna , fila
+				//pasar posiciOn efectiva de columna , fila
 			    screen_actualizar_posicion_mapa(j,i-1);//pasar posiciOn efectiva de columna , fila
 
 			    letra = screen_valor_actual(i, j);
@@ -263,14 +263,7 @@ void screen_actualizar_reloj_pirata (jugador_t *j, pirata_t *pirata) {
         screen_pintar(reloj[pirata->reloj], C_BW, 48, 59+2*pirata->index);
     }
 }
-
-/*
-void screen_pintar_reloj_pirata(jugador_t *j, pirata_t *pirata) {}
-void screen_pintar_reloj_piratas(jugador_t *j) {}
-void screen_pintar_relojes() {}
-void screen_stop_game_show_winner(jugador_t *j) {}
-int32_t ee_printf(const char *fmt, ...) {}*/
-
+ 
 // Escribe el caracter nulo en todas las celdas de la pantalla y pone fondo negro
 void clear_screen() {
 	uint32_t fila, columna;
@@ -418,12 +411,12 @@ void restaurar_pantalla_original()
 void mostrar_info_debugger(){
 	 respaldo_pantalla_original();
   screen_pantalla_debug();
-  while(modo_debug_activado)
+  while(modo_debug)
   {
     ;
   }
   restaurar_pantalla_original();
-  modo_debug_activado = 1;
+  modo_debug = 1;
 	
 	}
 

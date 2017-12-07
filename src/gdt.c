@@ -71,7 +71,7 @@ gdt_entry gdt[40] = {
  
     // Segmento para código de nivel cero (kernel)
     //lImite modificado: 0x1F3FF tal que ((0x1F3FF + 0x1 )* 0x1000) - 0x1 = 500 megas
-    //anterior lImite: 0x7cfff.
+    
     [SEGMENTO_CODIGO_NIVEL_0] = (gdt_entry) {//8
         (uint16_t)    0xF3FF ,
         (uint16_t)    SEGMENT_BASE_ADDRESS_0_15,

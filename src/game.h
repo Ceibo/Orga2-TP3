@@ -35,8 +35,6 @@ typedef struct pirata_t
     uint32_t index;// valor entre 0 y 7 para indizar en array piratas de jugador
     struct jugador_t *jugador;
     uint32_t libre; //libre: -1- slot disponible para lanzar tarea / -false- ya hay un tarea activa
-	//uint32_t tesoro_x;//posiciOn x de tesoro en caso de ser explorador
-    //uint32_t tesoro_y;//posiciOn y de tesoro en caso de ser explorador
 	uint32_t x;//posiciOn (0 =< x =< 79) - no consultar si estA libre
 	uint32_t y;//posiciOn (0 =< y =< 43)
 	uint32_t tipo; //0 = explorador, 1 = minero
@@ -47,23 +45,19 @@ typedef struct pirata_t
 
 typedef struct jugador_t
 {
-   uint32_t index;// 0 o 1
+    uint32_t index;// 0 o 1
     pirata_t piratas[MAX_CANT_PIRATAS_VIVOS];
-    //uint32_t x; //posiciOn jugador
-    //uint32_t y; //posiciOn jugador
-    // coordenadas puerto, posiciones exploradas, mineros pendientes, etc
     int32_t vistas_x[9]; //guarda las posiciones de entorno a donde se mueve. asocia x con y
     int32_t vistas_y[9];// ej: explorar (2,3) => vistas_x[i] = 2, vistas_y[i] = 3, 0 =< i =< 8.
-    
-	 int32_t puntos;
-	 uint32_t x_puerto;//fila de puerto salida de pirata (0 =< x =< 79)
-     uint32_t y_puerto;//columna de puerto salida de pirata (0 =< y =< 43)
+	int32_t puntos;
+	uint32_t x_puerto;//fila de puerto salida de pirata (0 =< x =< 79)
+    uint32_t y_puerto;//columna de puerto salida de pirata (0 =< y =< 43)
       
 } jugador_t;
 
 
 extern jugador_t jugadorA, jugadorB;
-uint8_t modo_debug_activado;
+uint8_t modo_debug;
 uint8_t pantalla_debug_activada;
 
 // ~ auxiliares dadas ~

@@ -43,8 +43,8 @@ _isr%1:
     mov dword [debugger + 24], ebp
     mov dword [debugger + 28], esp
  
-	mov eax, [esp+12] ; eip
-	mov dword [debugger + 32], eax ;eip  \
+	mov eax, [esp+12]  
+	mov dword [debugger + 32], eax  
 		
 	mov ax, cs
 	mov word [debugger + 36], ax
@@ -99,11 +99,7 @@ _isr%1:
 
 %endmacro
 
-;;
-;; Datos
-;; -------------------------------------------------------------------------- ;;
-; Scheduler
-
+ 
 ;;
 ;; Rutina de atención de las EXCEPCIONES
 ;; -------------------------------------------------------------------------- ;;
@@ -138,10 +134,10 @@ extern debugger_activo
 
 _isr32:
 	pushad
-	;pushfd;agregado *****
+	 
 	call fin_intr_pic1; comunicamos al pic que ya se atendiO la interrupciOn permitiendo 
 	;nuevas llamadas desde el dispositivo.
-	;xchg bx, bx; magic breakpoint *****
+	 
 	call debugger_activo
 	cmp eax, 1
     je .fin
@@ -152,12 +148,12 @@ _isr32:
 	str cx
 	cmp ax,cx; si siguiente es igual a actual no se switchea
 	je .fin
-	;xchg bx, bx; magic breakpoint *****
+	 
 	mov [sched_tarea_selector],ax
 	jmp far [sched_tarea_offset]
 	
 .fin:
-    ;popfd;agregado *****
+     
 	popad
 	iret; retornamos de la interrupciOn habilitando interrupciones.
 	 
@@ -172,20 +168,18 @@ global _isr33 ; (5)
   
 _isr33:
 	pushad
-	;pushfd;agregado *****
-	;nuevas llamadas desde el dispositivo.
+	 
 	xor eax,eax
 	in al,0x60; leemos teclado
-	;test al,10000000b
-	;jnz .fin; no hay informaciOn util. finalizamos
+	 
 	push eax; pasamos parAmetro a procedimiento siguiente
-	;xchg bx, bx; magic breakpoint *****
+	 
 	call game_atender_teclado; rutina de teclado
  	add esp,4
  	call fin_intr_pic1; comunicamos al pic que ya se atendiO la interrupciOn permitiendo 
 
 .fin:
-    ;popfd;agregado *****
+     
 	popad
 	iret;
 	
@@ -200,7 +194,7 @@ extern game_id_pirata_actual
 extern game_syscall_pirata_posicion
 
 _isr70:
-	 ;xchg bx, bx; magic breakpoint ******
+	  
 
 	 pushad
 	 cmp eax,0x1
@@ -220,10 +214,7 @@ _isr70:
 	push eax; id de pirata actual
 	call game_syscall_pirata_mover;  retorna en eax : -1,0
     add esp,8
-    ;cmp eax,0
-    ;je .fin; si eax = 0 entonces retornar 
-    ;cmp eax,-1
-    ;je .kill; si eax = -1 entonces matar tarea
+     
     jmp .fin
     
 .cavar:

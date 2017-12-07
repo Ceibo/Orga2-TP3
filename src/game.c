@@ -104,7 +104,7 @@ void game_calcular_posiciones_vistas(int* vistas_x, int* vistas_y, int x, int y)
 }
 
 
-void game_inicializar()//*************** agregado ************
+void game_inicializar()
 {
 	 //breakpoint(); 
 	game_jugador_inicializar(&jugadorA);
@@ -117,7 +117,7 @@ void game_inicializar()//*************** agregado ************
 	sched_inicializar();
 	
 	//modo debug
-	modo_debug_activado = 0;
+	modo_debug = 0;
     pantalla_debug_activada = 0;
 	 
 }
@@ -252,31 +252,26 @@ void game_pirata_relanzar(pirata_t *pirata, jugador_t *j, uint32_t  tipo)
 	// memoria para el nuevo pirata, que carguen su tss correspondiente,
 	// lo scheduleen y finalmente lo pinten en pantalla
      
-    //breakpoint();
+ 
  	//inicializamos tss
- 	
- 	//****************** quitar **********************//
- 	//inic_descriptor_tss(23);
- 	//****************** quitar **********************//
-
+ 	 
 	uint32_t dirFisDestinoCod = dir_Fis_DestinoCod(pirata->x,pirata->y); 
 	tss_libre(pirata->index,j->index,dirFisDestinoCod , pirata->id);
 	
 	//pintamos
 	screen_pintar_pirata(j, pirata);
 
-	//listo para usar (temporario)
-}
-/*
-//viene de game_atender_teclado - busca slot libre para reservar
-*/
-pirata_t* game_jugador_erigir_pirata(jugador_t *j, uint32_t  tipo)
-{   
-    //game_jugador_lanzar_pirata(j,tipo,j->x_puerto,j->y_puerto);
-	return NULL;
+	 
 }
 
-//*********** agregado ************
+//viene de game_atender_teclado - busca slot libre para reservar
+
+pirata_t* game_jugador_erigir_pirata(jugador_t *j, uint32_t  tipo)
+{   
+     return NULL;
+}
+
+ 
 // debe devolver el proximo pirata del arreglo que no esté siendo usado actualmente
 pirata_t* game_jugador_dame_pirata_libre(jugador_t *j)
 {
@@ -346,7 +341,7 @@ uint32_t  game_syscall_pirata_mover(uint32_t  id, direccion dir)
 	int x,y;
 	
 	//calculamos incrementos de coordenadas
-	uint32_t res =  game_dir2xy(dir, &x, &y); //si argumento vAlido entonces res = 0. 
+	uint32_t res =  game_dir2xy(dir, &x, &y);  
 	
 	//si res == -1  (argumento invAlido) matar tarea
 	if(res == -1){
@@ -387,13 +382,13 @@ uint32_t  game_syscall_pirata_mover(uint32_t  id, direccion dir)
 				  
 				if(game_valor_tesoro(j->vistas_x[k],j->vistas_y[k])){
 				 //breakpoint();
-				    //int libre = sched_buscar_tarea_libre(j->index);
+				     
 				    pirata_t* nuevo = game_jugador_dame_pirata_libre(j);
 				    
 				    //libre es Indice en tasks de scheduler. si hay libre guardar allI posiciones
-				    //if(libre != 1000){
+				     
 					if(nuevo != NULL){	
-						//breakpoint();
+						 
 						uint16_t selector = (nuevo->id )<<3 | 0x0;;
 						uint16_t libre = buscar_tarea(selector);
  						scheduler.tasks[libre].posiciOn_x_tesoro = j->vistas_x[k];
@@ -404,7 +399,7 @@ uint32_t  game_syscall_pirata_mover(uint32_t  id, direccion dir)
 	
 						sched_agregar_tarea(index_tasks);
 					}else{
-						//breakpoint();
+						 
 					//si no hay libre guardar posiciones en array posiciones de scheduler (si es posible)
 					    sched_guardar_prox_pos_en_buffer_tesoro(j->index,j->vistas_x[k],j->vistas_y[k]);	
 					}
@@ -419,8 +414,7 @@ uint32_t  game_syscall_pirata_mover(uint32_t  id, direccion dir)
 			res = -1;
 	}
 	 
-    return res;//si res == -1 se debe matar tarea (argumentos de syscall invAlidos)
-    //si res == 0 entonces continuar tarea 
+    return res; 
 }
 
 uint32_t  game_syscall_cavar(uint32_t  id)
@@ -491,7 +485,7 @@ void game_pirata_exploto(uint32_t  id)
 {
 	pirata_t* morgan = id_pirata2pirata(id);
 	//permitimos que slot de pirata estE disponible
-	//if(morgan != NULL){
+	 
 		morgan->libre = 1;
 		//borramos pirata de pantalla
 		screen_borrar_pirata(morgan->jugador,morgan);
@@ -501,15 +495,15 @@ void game_pirata_exploto(uint32_t  id)
 	
 		if(morgan->jugador->index == INDICE_JUGADOR_A) screen_pintar('X', 0x04, 48, 4+2*morgan->index);
 		else screen_pintar('X', 0x01, 48, 59+2*morgan->index);
-    //}
-     if(modo_debug_activado)
+     
+     if(modo_debug)
     {
         pantalla_debug_activada = 1;
         mostrar_info_debugger(); 
         pantalla_debug_activada = 0;
     }
     
-    //error();
+     
 }
 
 pirata_t* game_pirata_en_posicion(uint32_t  x, uint32_t  y)
@@ -558,30 +552,21 @@ void game_atender_teclado(uint8_t tecla)//(5)
 {
 	switch (tecla)
 	{
-		//case KB_y: screen_pintar('y', C_FG_LIGHT_GREY, 30, 50);break;
-		//case bc_y: screen_pintar(219, C_FG_LIGHT_GREY, 30, 50);break;//break code y 
-  
-		//case KB_q: screen_pintar('q', C_FG_LIGHT_GREY, 30, 50);break;
- 
-		//case KB_a:  screen_pintar('a', C_FG_LIGHT_GREY, 30, 50);break;
- 
-		//case KB_k:   screen_pintar('k', C_FG_LIGHT_GREY, 30, 50);break;
-  
+		 
 		case KB_shiftL:  game_jugador_lanzar_pirata(&jugadorA,TIPO_EXPLORADOR,jugadorA.x_puerto,jugadorA.y_puerto);break;
 
- 		//  screen_pintar('+', C_FG_LIGHT_GREY, 30, 50); break;
-		//case bc_shiftL:   screen_pintar(219, C_FG_LIGHT_GREY, 30, 50);break;//break code shiftl
-
+ 		 
 		case KB_shiftR:  game_jugador_lanzar_pirata(&jugadorB,TIPO_EXPLORADOR,jugadorB.x_puerto,jugadorB.y_puerto);break; 
-		//screen_pintar('-', C_FG_LIGHT_GREY, 30, 50);break;//lanzar jugadorB
-		//case bc_shiftR:   screen_pintar(219, C_FG_LIGHT_GREY, 30, 50);break;//break code shiftr
-
-	//modo debug
-     case KB_y  :
+		 
+        case KB_y  :
     
-        modo_debug_activado = modo_debug_activado? 0: 1;
-        
-        if(modo_debug_activado){
+         
+        if(modo_debug)
+			modo_debug = 0;
+		else
+		    modo_debug = 1;
+		    
+        if(modo_debug){
 			print("MODO DEBUG ACTIVADO",25,0,0x0f0f);
 		} else{
 			screen_pintar_rect(0, 0x00, 0, 25, 1, 23);
@@ -594,7 +579,7 @@ void game_atender_teclado(uint8_t tecla)//(5)
 }
 
  uint32_t dir_code_x_tipo_pirata(uint32_t id){
-	//hecha por alumno
+	 
 	 uint32_t res;
 	 if(id_pirata2pirata(id)->tipo == TIPO_EXPLORADOR && 
 	 id_pirata2pirata(id)->jugador->index == INDICE_JUGADOR_A){

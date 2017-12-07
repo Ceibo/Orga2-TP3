@@ -137,10 +137,6 @@ void tss_libre(int pirata, uint32_t jugador,   uint32_t dirFisDestinoCod, uint32
     TSS_ENTRY(tss_jugadorA[pirata],reg_ctrl_3,0x400000,0x400ff4,0x400ff4,0x005b,0x0053,0x005b,0x005b,0x005b,0x005b,esp_0,0x0048);    
  }else{
 	 
-    //********************* quitar ***********************//
-	//TSS_ENTRY(tss_jugadorB[0],reg_ctrl_3,0x400000,0x400ff4,0x400ff4,0x005b,0x0053,0x005b,0x005b,0x005b,0x005b,esp_0,0x0048);    
-    //********************* quitar ***********************//
-
     TSS_ENTRY(tss_jugadorB[pirata],reg_ctrl_3,0x400000,0x400ff4,0x400ff4,0x005b,0x0053,0x005b,0x005b,0x005b,0x005b,esp_0,0x0048);    
  }
 };

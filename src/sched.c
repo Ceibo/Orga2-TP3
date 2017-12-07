@@ -71,37 +71,7 @@ void sched_inicializar()
 int sched_buscar_indice_tarea(uint32_t gdt_index) {
     return MAX_CANT_TAREAS_VIVAS;
 }
-/*********
-
-int sched_buscar_tarea_libre(uint32_t index_j)
-{
-	//int i;
-	int indice = 1000;
-	if(INDICE_JUGADOR_A  == index_j){
-		pirata_t* morgan = game_jugador_dame_pirata_libre(&jugadorA);
-		uint16_t selector = (morgan->id )<<3 | 0x0;;
-		indice = buscar_tarea(selector);
-	}else{
-		pirata_t* morgan = game_jugador_dame_pirata_libre(&jugadorB);
-		uint16_t selector = (morgan->id )<<3 | 0x0;;
-		indice = buscar_tarea(selector);
-	}
-		
-	 return indice;
-	 
-	int i;
-	int indice = 1000;
-	//int j = (int) scheduler.current + 1;
-    for(i = 0; i < MAX_CANT_TAREAS_VIVAS+1; i++){
-	  indice = i;//(j+i)% (MAX_CANT_TAREAS_VIVAS+1); 
-	  if(scheduler.tasks[indice].pirata != NULL && scheduler.tasks[indice].pirata->libre && 
-	     scheduler.tasks[indice].pirata->jugador->index == index_j)
-	    break;
-    }
-    return indice;
-    
-}
-***********/
+ 
 void sched_guardar_prox_pos_en_buffer_tesoro(uint32_t index_j,uint32_t x, uint32_t y){
 	uint16_t i,k;
 	
@@ -147,34 +117,23 @@ pirata_t* sched_tarea_actual()
 
 void sched_agregar_tarea(uint16_t index_task)
 {
-	/*
-	//si prox == 500 entonces pisamos con Indice de nuevo pirata a prox y current
-	if(scheduler.prox == 500){
-		scheduler.prox = index_task;
-		scheduler.current = index_task;
-	} 
-	*/ //else{
+	 
 	if( scheduler.prox != 500 ){
 		
 		//chequeamos si estamos saltando a tarea de mismo jugador
 		if(sched_tarea_actual()->jugador->index == scheduler.tasks[scheduler.prox].pirata->jugador->index){
-			//breakpoint();
+			 
 			//si dueño de pirata actual no es dueño de pirata a agregar pisamos prox
 			if(sched_tarea_actual()->jugador->index != scheduler.tasks[index_task].pirata->jugador->index){
 				//breakpoint();
 				scheduler.prox = index_task;//si es asI entonces actualizamos prox con nueva tarea
 				 
 			}
-			/*else if(scheduler.tasks[scheduler.current].gdt_index == 
-			scheduler.tasks[scheduler.prox].gdt_index){
-				//breakpoint();
-				//si hay Unica tarea pisamos prox
-				scheduler.prox = index_task;
-			}*/
+			 
 			 
 		 }
 	} 
-	//breakpoint();
+	 
 }
 
 void sched_remover_tarea(uint16_t index_task)
@@ -207,20 +166,18 @@ uint16_t sched_atender_tick()
 	int j;
 	//primero iteramos sOlo sobre los 8 piratas de jugadorA
 	for(j = 0; j < 8; j++){
-		//int libre = sched_buscar_tarea_libre( index_A);//si libre == 1000 no hay slot libre
-		//if(libre != 1000){
+		 
 		pirata_t* nuevo = game_jugador_dame_pirata_libre(&jugadorA);
 				    
-		//libre es Indice en tasks de scheduler. si hay libre guardar allI posiciones
-	    //if(libre != 1000){
+		 
 		if(nuevo != NULL){	
-						//breakpoint();
+						 
 			uint16_t selector2 = (nuevo->id )<<3 | 0x0;;
 		    uint16_t libre = buscar_tarea(selector2);
 						
 			 uint32_t index_pos = consultar_buffer_pos_tesoro(index_A);
 			 if (index_pos != 500){
-				 //breakpoint();
+				  
 				 //si hay slot libre y posiciOn en buffer reservamos minero y seteamos posiciOn tesoro
 				 scheduler.tasks[libre].posiciOn_x_tesoro = scheduler.
 				 posiciones_tesoros_A[index_pos][0];
@@ -240,14 +197,12 @@ uint16_t sched_atender_tick()
     //luego iteramos sOlo sobre los 8 piratas de jugadorB
 	for(j = 0; j < 8; j++){
 		
-		//int libre = sched_buscar_tarea_libre( index_B);//si libre == 1000 no hay slot libre
-		//if(libre != 1000){
+		 
 		pirata_t* nuevo = game_jugador_dame_pirata_libre(&jugadorB);
 				    
-		//libre es Indice en tasks de scheduler. si hay libre guardar allI posiciones
-	    //if(libre != 1000){
+		 
 		if(nuevo != NULL){	
-						//breakpoint();
+						 
 			uint16_t selector2 = (nuevo->id )<<3 | 0x0;;
 		    uint16_t libre = buscar_tarea(selector2);
 		    
@@ -267,26 +222,10 @@ uint16_t sched_atender_tick()
 				break;//no hay posiciones guardadas de B
 			 
 		}else
-			break;//si resultado es 1000 no hay slot libre y debemos abortar bUsqueda
+			break;//si no hay slot libre
     } 
     
-    //chequeamos si hay prOxima tarea:
-   // breakpoint();
-    /*
-    //si no jugadores activos devolvemos selector de gdt de actual (no se actualiza current)
-    if(scheduler.prox == 500)//idle es Unica activa//breakpoint();
- 		return scheduler.tasks[scheduler.current].gdt_index;
-	*/
-	
-    //si hay jugadores activos actualizamos prox y current con tarea a la que switcheamos:
-    
-	//current es tarea de algUn jugador y prox es a la que estamos switcheando
-	//actualizamos prOxima tarea (debe ser de mismo jugador que la activa reciente)
-	//if(scheduler.current == 0)
-		//return scheduler.tasks[scheduler.current].gdt_index;
-	//else{
-	//uint16_t aux = scheduler.prox;//backup prox (lo necesitamos para current)
-	uint16_t index_task;
+    uint16_t index_task;
 	if(scheduler.tasks[scheduler.current].pirata != NULL){
 		uint32_t index_jug = scheduler.tasks[scheduler.current].pirata->jugador->index;
 		index_task = buscar_sig_tarea(index_jug );
@@ -304,30 +243,17 @@ uint16_t sched_atender_tick()
 	
 	//si hay prOxima tarea actualizamos current con esa tarea
 	if(scheduler.prox != 500)
-		scheduler.current = scheduler.prox;// *********** modificado **************
+		scheduler.current = scheduler.prox ;
     //si hay tarea activa de mismo jugador no en scheduler la ponemos como prOxima
 	if(index_task != 500){
-		 //breakpoint();
+		  
  		scheduler.prox = index_task;
 	}else{
 		//breakpoint();
 		return scheduler.tasks[scheduler.current].gdt_index;
 		
-		/*
-		breakpoint();
-		//si no hay tarea de jugador reciente buscamos de jugador contrario a tarea activa reciente
-		//en caso de no haber tarea tampoco en este caso prox queda seteado por default (500)
-		scheduler.current = aux; //para que empiece a buscar en pos siguiente a prox 
-		if(index_jug == INDICE_JUGADOR_A)
-			scheduler.prox = buscar_sig_tarea( INDICE_JUGADOR_B);
-		else
-			scheduler.prox = buscar_sig_tarea(INDICE_JUGADOR_A);
-		*/	
 	}
-	//breakpoint();
-	// actualizamos current (el valor que se retorna)
-	//scheduler.current = scheduler.prox;//en caso de no entrar en rama else
-	
+	 
 	//chequeamos si tarea dada por current actualizado estA activa o reservada 
 	if(scheduler.tasks[scheduler.current].reservado_minero){
 		//breakpoint();
@@ -366,10 +292,6 @@ uint16_t sched_atender_tick()
 	     
     return scheduler.tasks[scheduler.current].gdt_index; //*************** restaurar *******//
     
-    //***************** quitar *****************//
-        //return (uint16_t) 0xb8;
-    //***************** quitar *****************//
-
 }
 
 uint32_t consultar_buffer_pos_tesoro(uint32_t index_j){
