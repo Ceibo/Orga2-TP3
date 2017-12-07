@@ -48,7 +48,7 @@
 /* Definicion de la GDT */
 /* -------------------------------------------------------------------------- */
 
-gdt_entry gdt[GDT_COUNT] = {
+gdt_entry gdt[40] = {
     /* Descriptor nulo*/
     /* Offset = 0x00 */
     [GDT_IDX_NULL_DESC] = (gdt_entry) {//tamaño 64 bits == 8 bytes

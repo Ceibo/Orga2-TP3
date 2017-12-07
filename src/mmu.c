@@ -305,6 +305,19 @@ void mmu_mover_pirata(pirata_t *pirata, int viejo_x, int viejo_y){
   //mapeamos posiciOn junto a posiciones de alrededor como read only si es posible (sOlo explorador):
   if(pirata->tipo == TIPO_EXPLORADOR)
      mapear_paginas_matricialmente_contiguas(directorio, direccion_fisica_de_destino_del_codigo,id);
-
+  else if (pirata->tipo == TIPO_MINERO){//chequeamos que posiciOn a donde avanza estE mapeada
+     uint32_t  desplazamiento = desplazamiento_para_calcular_la_direccion_de_la_pagina_en_el_mapa(pirata->x, pirata->y);
+     unsigned int direccion_virtual = MAPA_BASE_VIRTUAL + desplazamiento;
+     unsigned int nro_tabla = direccion_virtual >> 22; // índice del directorio de páginas
+     unsigned int nro_pagina = (direccion_virtual << 10) >> 22; // índice de la tabla de páginas
+     if (!directorio[nro_tabla].p)
+		error();
+	 else{
+		 page_table_entry* tabla = (page_table_entry*) (directorio[nro_tabla].base << 12);
+		 if(!tabla[nro_pagina].p)
+			error();
+	}  
+   }
+   
 }
 

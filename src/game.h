@@ -41,6 +41,7 @@ typedef struct pirata_t
 	uint32_t y;//posiciOn (0 =< y =< 43)
 	uint32_t tipo; //0 = explorador, 1 = minero
     // id unica, posicion, tipo, reloj
+    uint32_t reloj;
 } pirata_t;
 
 
@@ -57,10 +58,13 @@ typedef struct jugador_t
 	 int32_t puntos;
 	 uint32_t x_puerto;//fila de puerto salida de pirata (0 =< x =< 79)
      uint32_t y_puerto;//columna de puerto salida de pirata (0 =< y =< 43)
+      
 } jugador_t;
 
 
 extern jugador_t jugadorA, jugadorB;
+uint8_t modo_debug_activado;
+uint8_t pantalla_debug_activada;
 
 // ~ auxiliares dadas ~
 uint32_t game_xy2lineal(uint32_t x, uint32_t y);
@@ -92,7 +96,7 @@ uint32_t game_syscall_manejar(uint32_t syscall, uint32_t param1);
 
 // ~~~ debe atender la interrupción de reloj para actualizar la pantalla y terminar si es hora,
 // ~~~ recibe el pirata que está corriendo actualmente
-void game_tick(uint16_t id_pirata);
+void game_tick(pirata_t* pirata);
 void game_terminar_si_es_hora();
 void game_atender_teclado(unsigned char tecla);
 uint32_t  game_posicion_valida(int x, int y);
@@ -114,4 +118,7 @@ uint32_t  game_dir2xy(direccion dir, int *x, int *y);
 uint16_t game_id_pirata_actual();
 void game_calcular_pos_nuevas(int32_t * vistas_x,int32_t * vistas_y,int32_t nuevo_x, int32_t nuevo_y,int32_t x,int32_t y);
 
+
+uint32_t debugger_activo();
+ 
 #endif  /* !__GAME_H__ */

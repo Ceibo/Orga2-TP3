@@ -66,6 +66,9 @@ void screen_entorno_pirata(uint8_t color, int32_t fila, int32_t columna, int32_t
 uint8_t screen_color_actual(uint32_t fila, uint32_t columna);
 //si hay mAs de 100 monedas entonces devuelve *, sino $.
 uint8_t screen_caracter_tesoro(uint32_t valor);
-
+void mostrar_info_debugger();
+void screen_pantalla_debug();
+void mostrar_info_debugger();
+void restaurar_pantalla_original();
 
 #endif  /* !__SCREEN_H__ */

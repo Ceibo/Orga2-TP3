@@ -13,9 +13,39 @@ extern jugador_t jugadorA, jugadorB;
 
 
 static ca (*p)[VIDEO_COLS] = (ca (*)[VIDEO_COLS]) VIDEO;
+ 
 
+ca cartel[VIDEO_FILS][VIDEO_COLS];
 const char reloj[] = "|/-\\";
 #define reloj_size 4
+
+struct {
+  uint32_t eax;
+  uint32_t ebx;
+  uint32_t ecx;
+  uint32_t edx;
+  uint32_t esi;
+  uint32_t edi;
+  uint32_t ebp;
+  uint32_t esp;
+  uint32_t eip;
+  uint16_t cs;
+  uint16_t ds;
+  uint16_t es;
+  uint16_t fs;
+  uint16_t gs;
+  uint16_t ss;
+  uint32_t eflags;
+  uint32_t cr0;
+  uint32_t cr2;
+  uint32_t cr3;
+  uint32_t cr4;
+  uint32_t stack0;
+  uint32_t stack1;
+  uint32_t stack2;
+  uint32_t stack3;
+  uint32_t stack4;
+} __attribute__((__packed__)) debugger;
 
 
 void screen_actualizar_reloj_global()
@@ -101,7 +131,9 @@ void screen_entorno_pirata(uint8_t color, int32_t fila, int32_t columna, int32_t
 	for (i = fila; i < fila + alto; i++) {
 		for (j = columna; j < columna + ancho; j++) {
 			if(i < VIDEO_FILS && j < VIDEO_COLS){
-				screen_actualizar_posicion_mapa(j-1,i);//pasar posiciOn efectiva de columna , fila
+				//screen_actualizar_posicion_mapa(j-1,i);//pasar posiciOn efectiva de columna , fila
+			    screen_actualizar_posicion_mapa(j,i-1);//pasar posiciOn efectiva de columna , fila
+
 			    letra = screen_valor_actual(i, j);
 			    if(letra == 0)//si no hay nada pisamos color anterior con color de jugador
 					color2 = color;
@@ -130,9 +162,25 @@ void screen_inicializar() {
 	screen_pintar_rect(0, C_BG_LIGHT_GREY, 1, 0, 44, 80); // mapa con fondo gris
 	screen_pintar_rect(0, C_BG_RED, 45, 33, 5, 7); // barra de jugador rojo
 	screen_pintar_rect(0, C_BG_BLUE, 45, 40, 5, 7); // barra de jugador azul
+	screen_pintar_puntajes();
+	 //slots
+    int i;
+    for (i = 1; i < 9; i++)
+    {
+        print_dec(i, 1, 2+2*i , 46, C_BW);
+        screen_pintar('X', 0x04 , 48, 2+2*i);
+        print_dec(i, 1, 57+2*i , 46, C_BW);
+        screen_pintar('X', 0x01 , 48, 57+2*i);
+    }
+
 }
 
-void screen_pintar_puntajes() {}
+void screen_pintar_puntajes() {
+	
+	print_dec(jugadorA.puntos, 3, 35, 47, 0x4F);
+    print_dec(jugadorB.puntos, 3, 42, 47, 0x1F);
+	
+	}
 
 uint8_t screen_color_jugador(jugador_t *j) {
 	 if (j == NULL)
@@ -141,7 +189,7 @@ uint8_t screen_color_jugador(jugador_t *j) {
     if (j->index == INDICE_JUGADOR_A)
         return C_FG_GREEN;
     else
-        return C_FG_LIGHT_BLUE;
+        return C_FG_BLUE ;
 	}
 	
 void screen_pintar_pirata(jugador_t *j, pirata_t *pirata) {
@@ -202,9 +250,21 @@ void screen_borrar_pirata(jugador_t *j, pirata_t *pirata) {
 	screen_pintar('.', bg | C_FG_BLACK, pirata->y+1, pirata->x);
     screen_actualizar_posicion_mapa(pirata->x, pirata->y);//posiciOn efectiva
 	}
+	
+void screen_actualizar_reloj_pirata (jugador_t *j, pirata_t *pirata) {
+	pirata->reloj = (pirata->reloj+ 1) % reloj_size;
+
+    if(j->index == INDICE_JUGADOR_A)
+    {
+        screen_pintar(reloj[pirata->reloj], C_BW, 48, 4+2*pirata->index);
+    }
+    else
+    {
+        screen_pintar(reloj[pirata->reloj], C_BW, 48, 59+2*pirata->index);
+    }
+}
 
 /*
-void screen_actualizar_reloj_pirata (jugador_t *j, pirata_t *pirata) {}
 void screen_pintar_reloj_pirata(jugador_t *j, pirata_t *pirata) {}
 void screen_pintar_reloj_piratas(jugador_t *j) {}
 void screen_pintar_relojes() {}
@@ -291,4 +351,79 @@ if(i == 32)
 void imprimir_nombre_de_grupo(){
     print("El crew de Ariane 5", 61, 0, C_BG_MAGENTA+C_FG_LIGHT_GREEN);
 }
+
+
+void screen_pantalla_debug()
+{
+  uint32_t x = 25, y = 7;
+
+  screen_pintar_rect(0, 0x00, y, x, 36, 32);
+  screen_pintar_rect(0, 0x77, y+1, x+1, 34, 30);
+  screen_pintar_rect(0, 0x44, y+1, x+1, 1, 30);
+
+
+  print("eax", x+2, y+3 , 0x70); print_hex(debugger.eax, 8, x+6, y+3 , 0x7f);
+  print("ebx", x+2, y+5 , 0x70); print_hex(debugger.ebx, 8, x+6, y+5 , 0x7f);
+  print("ecx", x+2, y+7 , 0x70); print_hex(debugger.ecx, 8, x+6, y+7 , 0x7f);
+  print("edx", x+2, y+9 , 0x70); print_hex(debugger.edx, 8, x+6, y+9 , 0x7f);
+  print("esi", x+2, y+11, 0x70); print_hex(debugger.esi, 8, x+6, y+11, 0x7f);
+  print("edi", x+2, y+13, 0x70); print_hex(debugger.edi, 8, x+6, y+13, 0x7f);
+  print("ebp", x+2, y+15, 0x70); print_hex(debugger.ebp, 8, x+6, y+15, 0x7f);
+  print("esp", x+2, y+17, 0x70); print_hex(debugger.esp, 8, x+6, y+17, 0x7f);
+  print("eip", x+2, y+19, 0x70); print_hex(debugger.eip, 8, x+6, y+19, 0x7f);
+
+
+  print("cs", x+3, y+21, 0x70); print_hex(debugger.cs, 4, x+6, y+21, 0x7f);
+  print("ds", x+3, y+23, 0x70); print_hex(debugger.ds, 4, x+6, y+23, 0x7f);
+  print("es", x+3, y+25, 0x70); print_hex(debugger.es, 4, x+6, y+25, 0x7f);
+  print("fs", x+3, y+27, 0x70); print_hex(debugger.fs, 4, x+6, y+27, 0x7f);
+  print("gs", x+3, y+29, 0x70); print_hex(debugger.gs, 4, x+6, y+29, 0x7f);
+  print("ss", x+3, y+31, 0x70); print_hex(debugger.ss, 4, x+6, y+31, 0x7f);
+  
+  print("eflags", x+3, y+33, 0x70); print_hex(debugger.eflags, 8, x+9, y+33, 0x7f);
+  
+  print("cr0", x+16, y+3, 0x70); print_hex(debugger.cr0, 8, x+20, y+3, 0x7f);
+  print("cr2", x+16, y+5, 0x70); print_hex(debugger.cr2, 8, x+20, y+5, 0x7f);
+  print("cr3", x+16, y+7, 0x70); print_hex(debugger.cr3, 8, x+20, y+7, 0x7f);
+  print("cr4", x+16, y+9, 0x70); print_hex(debugger.cr4, 8, x+20, y+9, 0x7f);
+
+  print("stack", x+16, y+20, 0x70); 
+  print_hex(debugger.stack0, 8, x+16, y+22, 0x7f);
+  print_hex(debugger.stack1, 8, x+16, y+23, 0x7f);
+  print_hex(debugger.stack2, 8, x+16, y+24, 0x7f);
+  print_hex(debugger.stack3, 8, x+16, y+25, 0x7f);
+  print_hex(debugger.stack4, 8, x+16, y+26, 0x7f);
+
+}
+void respaldo_pantalla_original()
+{
+  uint32_t i, j;
+  for(i = 0; i<VIDEO_FILS; i++){
+    for(j = 0; j<VIDEO_COLS; j++){
+      cartel[i][j] = p[i][j];
+    }
+  }
+}
+
+void restaurar_pantalla_original()
+{
+  uint32_t i, j;
+  for(i = 0; i<VIDEO_FILS; i++){
+    for(j = 0; j<VIDEO_COLS; j++){
+      p[i][j] = cartel[i][j];
+    }
+  }
+}
+
+void mostrar_info_debugger(){
+	 respaldo_pantalla_original();
+  screen_pantalla_debug();
+  while(modo_debug_activado)
+  {
+    ;
+  }
+  restaurar_pantalla_original();
+  modo_debug_activado = 1;
+	
+	}
 

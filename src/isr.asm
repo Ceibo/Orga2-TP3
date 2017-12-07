@@ -18,24 +18,84 @@ extern fin_intr_pic1
 extern sched_tick
 extern sched_tarea_actual
 
+;;debug
+extern debugger
+
 ;;
 ;; Definición de MACROS
 ;; -------------------------------------------------------------------------- ;;
 extern print_isr
+extern game_pirata_exploto
+extern game_id_pirata_actual
 
 %macro ISR 1
 global _isr%1
 
 _isr%1:
-    xchg bx, bx; magic breakpoint ******
+    ;guardamos en estructura debugger info de pirata muerto
 
-	push %1
-    call print_isr
-    add esp, 4
+	mov dword [debugger + 00], eax
+    mov dword [debugger + 04], ebx
+    mov dword [debugger + 08], ecx
+    mov dword [debugger + 12], edx
+    mov dword [debugger + 16], esi
+    mov dword [debugger + 20], edi
+    mov dword [debugger + 24], ebp
+    mov dword [debugger + 28], esp
+ 
+	mov eax, [esp+12] ; eip
+	mov dword [debugger + 32], eax ;eip  \
+		
+	mov ax, cs
+	mov word [debugger + 36], ax
+	mov ax, ds
+	mov word [debugger + 38], ax
+	mov ax, es
+	mov word [debugger + 40], ax
+	mov ax, fs
+	mov word [debugger + 42], ax
+	mov ax, gs
+	mov word [debugger + 44], ax
+	mov ax, ss
+	mov word [debugger + 46], ax
+    
+    xor eax, eax
+    pushf    ; obtenemos el registro
+    pop ax   ; eflags
+    mov dword [debugger + 48], eax
+    
+    mov eax, cr0
+  	mov dword [debugger + 52], eax
+  	mov eax, cr2
+  	mov dword [debugger + 56], eax
+  	mov eax, cr3
+  	mov dword [debugger + 60], eax
+  	mov eax, cr4
+  	mov dword [debugger + 64], eax
+  	
+  	mov eax, [esp]
+  	mov dword [debugger + 68], eax
+  	mov eax, [esp+4]
+  	mov dword [debugger + 72], eax
+  	mov eax, [esp+8]
+  	mov dword [debugger + 76], eax
+  	mov eax, [esp+12]
+  	mov dword [debugger + 80], eax
+    mov eax, [esp+16]
+  	mov dword [debugger + 84], eax
 
-    mov eax, %1
-    jmp $
-    iret
+
+    
+    call game_id_pirata_actual; ax tiene id de pirata actual
+	shl eax,16
+	shr eax,16; limpiamos word de arriba de eax
+ 	push eax;
+ 	sti
+	call game_pirata_exploto
+	add esp,4
+    
+     
+    jmp 0x70:0 ;voy a idle
 
 %endmacro
 
@@ -74,13 +134,19 @@ ISR 19
 
 global _isr32 ; (5)
 extern sched_atender_tick
- 
+extern debugger_activo
+
 _isr32:
 	pushad
 	;pushfd;agregado *****
 	call fin_intr_pic1; comunicamos al pic que ya se atendiO la interrupciOn permitiendo 
 	;nuevas llamadas desde el dispositivo.
 	;xchg bx, bx; magic breakpoint *****
+	call debugger_activo
+	cmp eax, 1
+    je .fin
+    xor eax, eax
+    
 	call sched_atender_tick; rutina de sched-reloj , ax es selector a siguiente tarea
 	
 	str cx
@@ -129,9 +195,7 @@ _isr33:
 global _isr70 ; (5)
 extern game_syscall_pirata_mover
 extern game_pirata_exploto
-;extern posiciOn_x_tesoro
-;extern posiciOn_y_tesoro
-;extern sched_buscar_tarea_libre
+extern game_syscall_cavar
 extern game_id_pirata_actual
 extern game_syscall_pirata_posicion
 
@@ -163,7 +227,14 @@ _isr70:
     jmp .fin
     
 .cavar:
-	 
+    call game_id_pirata_actual; ax tiene id de pirata actual
+	shl eax,16
+	shr eax,16; limpiamos word de arriba de eax
+ 	push eax; id de pirata actual
+    call game_syscall_cavar
+    add esp,4
+	jmp .fin
+	
 .posicion:
     mov ebx,ecx; backup caso
 	call game_id_pirata_actual; ax tiene id de pirata actual

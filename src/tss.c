@@ -92,14 +92,17 @@ void inic_descriptor_tss(int i){
        GDT_ENTRY(gdt[i], tss_idle, 0x3);
        return;
      }
-     if(i >= 15 || i < 23){//descriptor de prueba para pirata
+     /**/
+     if(i >= 15 && i < 23){//descriptor de prueba para pirata
 	   GDT_ENTRY(gdt[i], tss_jugadorA[i-15], 0x3);
        return;
 	 }
-	 if(i >= 23 || i < 31){//descriptor de prueba para pirata
+	 
+	 if(i >= 23 && i < 31){//descriptor de prueba para pirata
 	   GDT_ENTRY(gdt[i], tss_jugadorB[i-23], 0x3);
        return;
 	 }
+	 /**/
      else 
 	  return;
  }; 
@@ -133,7 +136,11 @@ void tss_libre(int pirata, uint32_t jugador,   uint32_t dirFisDestinoCod, uint32
                    //TSS_ENTRY(str,reg_ctrl_3,eip_reg ,esp_seg ,ebp_seg ,es_seg,cs_seg,ss_seg,ds_seg,fs_seg,gs_seg,esp0_dir,ss0_seg)         
     TSS_ENTRY(tss_jugadorA[pirata],reg_ctrl_3,0x400000,0x400ff4,0x400ff4,0x005b,0x0053,0x005b,0x005b,0x005b,0x005b,esp_0,0x0048);    
  }else{
-	  
+	 
+    //********************* quitar ***********************//
+	//TSS_ENTRY(tss_jugadorB[0],reg_ctrl_3,0x400000,0x400ff4,0x400ff4,0x005b,0x0053,0x005b,0x005b,0x005b,0x005b,esp_0,0x0048);    
+    //********************* quitar ***********************//
+
     TSS_ENTRY(tss_jugadorB[pirata],reg_ctrl_3,0x400000,0x400ff4,0x400ff4,0x005b,0x0053,0x005b,0x005b,0x005b,0x005b,esp_0,0x0048);    
  }
 };

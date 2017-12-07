@@ -53,7 +53,7 @@ typedef struct sched_t
     uint32_t posiciones_tesoros_B[20][2];//posiciones de monedas descubiertas por jugadorB 
     uint16_t inicio_tesoros_B;//por default es 0
     uint16_t prox;//Indice de prOxima tarea a switchear (si es 500 no debe usarse para switchear)
-     
+    int32_t tiempo_sin_cambios;//
 } sched_t;
 
 extern sched_t scheduler;
@@ -75,7 +75,7 @@ pirata_t* sched_tarea_actual();
 
 //devuelve primer Indice de tarea libre en tasks de scheduler (0 - 16) despuEs de actual
 //para un jugador especIfico. si retorna 1000 entonces no hay tarea libre
-int sched_buscar_tarea_libre(uint32_t index_j);
+//int sched_buscar_tarea_libre(uint32_t index_j);
 
 void sched_inicializar();
 
@@ -96,4 +96,5 @@ uint16_t buscar_sig_tarea(uint32_t index_j);
 
 //dado un selector de segmento devuelve su Indice en tasks
 uint16_t buscar_tarea(uint16_t selector);
+bool sched_descubierto(uint32_t index_j,uint32_t x, uint32_t y);
 #endif	/* !__SCHED_H__ */
