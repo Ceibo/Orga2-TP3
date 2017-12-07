@@ -149,18 +149,13 @@ BITS 32
     ; Saltar a la primera tarea: Idle  (6)
 	mov ax,0x0068; (0000 0000 0 1101 000)b ,13, selector indiza a descriptor tss inicial en gdt (6)
 	ltr ax; cargamos selector a descriptor de tss inicial en registro tr
-	;xchg bx,bx ; magic breakpoint *******
-
-	call game_inicializar ; **** test *******
+	 
+	call game_inicializar ;  
      
 	jmp 0x70:0; (0000 0000 0 1110 000)b ,Indice 14 ,salto a tarea idle  
 	xchg bx,bx ; magic breakpoint *******
-	;saltamos a tarea pirata (test)   ******** quitar ********
 	 
-	;xchg bx,bx ; magic breakpoint *******
-	;mov word [selector],0x78; (0000 0000 0 1111 000)b , jmp a tarea 
-    ;jmp far [offset]
-	
+	 
 	
     ; Ciclar infinitamente (por si algo sale mal...)
     mov eax, 0xFFFF
