@@ -228,7 +228,7 @@ void game_tick(pirata_t* pirata) {
 	screen_actualizar_reloj_pirata(pirata->jugador,pirata);
   }
   if(scheduler.tiempo_sin_cambios == 10000){
-	  print("JUEGO TERMINADO",55,0,0x0f0f);
+	  print("JUEGO TERMINADO",25,0,0x0f0f);
 	  while(1){}
   }
 	
@@ -289,12 +289,14 @@ pirata_t* game_jugador_dame_pirata_libre(jugador_t *j)
 //viene de game_atender_teclado
 //reserva pirata en puerto de jugador para que scheduler lo active
 void game_jugador_lanzar_pirata(jugador_t *j, uint32_t  tipo, int x, int y)
-{ //********** hecho por alumno *************//
-	 
+{ 
+	
+	/************** version en que no se puede lanzar pirata si hay uno en posicion *****
+
 	//si hay un pirata perteneciente a jugador j en posiciOn no lanzamos 
 	if (game_pirata_en_posicion(x,y) != NULL)
 		return;
-     
+     **********************************************************************************/
 	//si no hay slot en piratas de jugador no lanzamos
 	pirata_t *pirata = game_jugador_dame_pirata_libre(j);
 	if (pirata == NULL)
