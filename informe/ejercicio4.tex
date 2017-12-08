@@ -5,7 +5,7 @@ Tenemos un manejador de memoria al que le podemos pedir una página libre. El me
 Con este mecanismo, si borramos una página física de todos los directorios la misma no podrá volver a ser asignada nuevamente, porque el manejador no se enterará que está libre, ya que la variable de la próxima página libre siempre crece.
 
 \subsubsection{Asignación de páginas}
-La función mmu\_mapear\_pagina se encarga de asignar un rango de direcciones de memoria virtual a memoria física en un directorio determinado, siendo ese rango el correspondiente a una página. Las direcciones físicas asignadas serán, por lo tanto, el rango [A, A+0x999] donde A es la dirección de comienzo de la página (múltiplo de 0x1000) y 0x999 es 0x1000 - 0x1. No se puede asignar un bloque de memoria menor a una página. Si una página no es suficiente, se puede llamar a esta función tantas veces como sea necesario con distinta páginas. Notar que no es necesario que las páginas físicas sean continuas, pues solo importa que las direcciones virtuales sean contiguas.\newline 
+La función mmu\_mapear\_pagina se encarga de asignar un rango de direcciones de memoria virtual a memoria física en un directorio determinado, siendo ese rango el correspondiente a una página. Las direcciones físicas asignadas serán, por lo tanto, el rango [A, A+0xFFF] donde A es la dirección de comienzo de la página (múltiplo de 0x1000) y 0xFFF es 0x1000 - 0x1. No se puede asignar un bloque de memoria menor a una página. Si una página no es suficiente, se puede llamar a esta función tantas veces como sea necesario con distinta páginas. Notar que no es necesario que las páginas físicas sean continuas, pues solo importa que las direcciones virtuales sean contiguas.\newline 
 Esta función, entonces, recibe los siguientes parámetros:
 \begin{itemize}
 \item Dirección física de comienzo de la página (múltiplo de 0x1000).
@@ -19,6 +19,9 @@ Pasos que realiza la función para hacer la asignación:
 \item Los 12 bits menos significativos corresponen al desplazamiento dentro de la página, que se usan en el mecanismo de paginación para poder acceder a direcciones particulares dentro de una página. En este caso los desestimamos porque siempre se asigna la página en bloque (solo necesitamos la dirección de comienzo).
 \item Si la entrada en el directorio de páginas correspondiente a la tabla (accedemos con el número de tabla calculado anteriormente) tiene el bit de presente activado, obtenemos la dirección de la tabla de páginas.
 \item Si no está presente, establecemos como dirección de tabla una dirección de página libre que le pedimos al manejador de memoria y activamos el bit de presente. Las 1024 entradas de esta nueva tabla las inicializamos vacías (en cero).
+\item En cada entrada, de directorio o de tabla, seteamos los atributos $read$ $write$ y $user$. Si queremos
+escribir en página seteamos ambos $read$ $write$ en 1 y si queremos acceder como usuarios seteamos ambos
+$user$ en 1.
 \item Ahora que tenemos la dirección de la tabla, accedemos a la entrada correspondiente a la página utilizando el número de página calculado al comienzo y pisamos los siguientes valores: activamos bit de presente y ponemos como dirección base la dirección física de la página que recibimos como parámetro.
 \item Finalmente llamamos a una función para invalidar la cache de traducción de direcciones.
 \end{itemize}

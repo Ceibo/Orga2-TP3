@@ -6,7 +6,7 @@ La paginación es un mecanismo que permite tratar a la memoria en bloques de tam
 \subsubsection{Directorio y tablas de páginas del kernel}
 El kernel tiene su propio directorio de páginas ubicado en la dirección física 0x27000. Este se va a encargar de las páginas de la zona del kernel, que corresponde a las direcciones físicas 0x00000000 a 0x003FFFFF. Estas direcciones serán asignadas a otras direcciones de memoria virtual, que casualmente en este caso coinciden con las direcciones físicas, por eso decimos que es la asignación identidad, pues la función de asignación es la función identidad.\newline
 Para asignar la memoria debemos calcular cuántas páginas necesitamos. Para eso hacemos la siguiente cuenta: (0x003FFFFF + 0x1) / 0x1000 que es igual a 0x400. 0x1000 es el tamaño de una página (en decimal es 4096 pues una página es de 4KB). El resultado 0x400 en decimal es 1024. Por lo cual necesitamos 1024 páginas para completar la zona del kernel. Casualmente 1024 es el tamaño de una tabla de páginas, por lo cual el directorio de páginas del kernel tendrá todas las entradas vacías excepto la primera, que hará referencia a una tabla que estará completamente llena. La tabla de páginas estará en la dirección física 0x28000.\newline
-La función que se encarga de inicializar el directorio del kernel es la función mmu\_inicializar\_dir\_kernel y realiza los siguientes pasos:
+La función que se encarga de inicializar el directorio del kernel es la función $mmu\_inicializar\_dir\_kernel$ y realiza los siguientes pasos:
 \begin{itemize}
 \item Llenar las 1024 entradas del directorio en cero. En particular el bit de presente está en cero, que en nuestro sistema operativo significa que la memoria correspondiente a esa tabla no está asignada.
 \item Modificar la primera entrada con los siguientes valores: 1) Bit de presente activado. 2) Bit de lectura-escritura activado. 3) Base en 0x27 que es la dirección física de la tabla (0x27000) corrida 12 bits a la derecha.
@@ -16,7 +16,7 @@ La función que se encarga de inicializar el directorio del kernel es la funció
 \subsubsection{Activación de paginación}
 Para tener el mecanismo de paginación funcionando, realizamos los siguientes pasos:
 \begin{itemize}
-\item Realizar las asignaciones de memoria deseadas (como mínimo la zona del kernel) tal como explicamos en la sección anterior. En nuestro sistema operativo lo hacemos llamando a mmu\_inicializar\_dir\_kernel.
+\item Realizar las asignaciones de memoria deseadas (como mínimo la zona del kernel) tal como explicamos en la sección anterior. En nuestro sistema operativo lo hacemos llamando a $mmu\_inicializar\_dir\_kernel$.
 \item Poner la dirección física del directorio en el registro de control 3 (CR3).
 \item Activar el bit más significativo del registro de control 0 (CR0). Este es el paso que activa el mecanismo.
 \end{itemize}

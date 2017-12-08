@@ -1,0 +1,16 @@
+\subsection{Ejercicio 5}
+
+\subsubsection{IDT}
+Inicializamos tres nuevas entradas en la $idt$: la 32, 33 y 70. Las dos primeras con campo $dpl$ en $0x0$, indicando que pueden ser accedidas por el kernel solamente, y la última con $dpl$ en $0x3$, para que pueda
+ser accedida por los usuarios.\\
+Debemos remapear las direcciones de las interrupciones 32 y 33 porque caen en índices de excepciones del
+procesador. Para esto llamamos a función $resetear$ $pic$. Luego habilitamos las interrupciones externas 
+llamando a la función $habilitar$ $pic$ que setea flag en registro de control.\\
+Para las rutinas de atención 32, 33 y 70 debemos resguardar los registros de uso general de manera que 
+las interrupciones sean transparentes a la tarea interrumpida. Luego, excepto en la rutina 70, se debe comunicar al $PIC$ que la interrupción
+ será atendida. Esto se hace llamando a la función $fin$ $intr$ $pic1$. Al salir de la rutina se debe restaurar
+los registros y ejecutar la instrucción $iret$.\\
+La interrupción del reloj solo debe invocar una función, en este caso $game$ $tick$. En cambio la rutina 
+del teclado debe leer del puerto $0x60$ la información de la tecla. Esto se hace con la instrucción $in$ en un
+registro, por ejemplo $in$ $ax$ , $0x60$.
+

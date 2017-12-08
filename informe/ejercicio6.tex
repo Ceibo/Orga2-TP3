@@ -1,0 +1,60 @@
+\subsection{Ejercicio 6}
+
+\subsubsection{TSS}
+Para intercambiar tareas necesitamos una tarea inicial, en realidad sólo su estructura de $tss$, para que al switchear se guarde el contexto actual y se pueda cargar el nuevo contexto, registros generales, selectores
+ de segmento, registros de control y flags. Entonces inicializamos la $tss$ inicial generando un descriptor 
+de $tss$ de la siguiente forma:
+\begin{itemize}
+\item campo $limite$ en $0x67$ (mínimamente).
+\item campo $base$ (separado en una $word$ y dos $bytes$) con dirección de estructura de $tss$ inicial.
+\item campo $tipo$ en $0x9$.
+\item campo $bit$ system en $0x0$ (es descriptor de sistema).
+\item campo $dpl$ en $0x0$ (nivel 0 para que tareas de nivel 3 no puedan saltar a esta).
+\item campo $presente$ en $0x1$ (descriptor presente).
+\item campos $avl$, $db$, $l$ y $g$ en 0x0
+\end{itemize}
+
+Luego se llena otro descriptor con los mismos valores excepto la base, que apuntará hacia la $tss$ de
+la tarea $idle$.\\
+La $tss$ de la tarea inicial no se llena ya que no se volverá a usar pero sí debemos llenar la $tss$ de la $idle$.
+Esto es:
+\begin{itemize}
+\item campo $cr3$ con actual $cr3$ (el de kernel).
+\item campo $eip$ en $0x16000$ (dirección de inicio del código de la $idle$).
+\item campo $esp$ en $0x27000$ (misma que del kernel).  
+\item campo $ebp$ en $0x27000$ (misma que del kernel).  
+\item campos $es$, $ds$ ,$gs$, $ss$ en $0x48$ (segmento de datos de nivel cero).
+\item campo $cs$ en $0x40$ (segmento de código de nivel cero).
+\item campo $fs$ en $0x60$ (segmento de video nivel 0).
+\item campo $esp0$ en $0x27000$ 
+\item campo $ss0$ en $0x48$ (segmento de datos de nivel cero).
+\end{itemize}
+
+Además mapeamos con $identity$ $mapping$ las direcciones $0x16000$, del código de la $idle$ y la dirección 
+$0x27000$ para la pila.\\
+Paso seguido llenamos las $tss$ de las tareas, ubicadas en array $tss$ $jugadorA$ y $tss$ $jugadorA$ de tamaño 8
+cada uno. Estas se llenan de la siguiente manera:
+
+\begin{itemize}
+\item campo $cr3$ con dirección de directorio de tarea. Se llama a función $mmu$ $inicializar$ $dir$ $pirata$ 
+con dirección de origen de código de tarea (entre $0x10000$ y $0x13000$) y posición de destino en el mapa 
+(puerto de partida). Obtenemos una dirección que será del nuevo directorio.
+\item campo $eip$ en $0x40000$ (dirección de inicio del código de la tarea).
+\item campo $esp$ en $0x400ff4$ (fin de página de código dejando lugar para 3 parámetros).  
+\item campo $ebp$ en $0x400ff4$.  
+\item campos $es$, $ds$ ,$fs$ ,$gs$, $ss$, en $0x005b$ (segmento de datos de nivel tresf).
+\item campo $cs$ en $0x0053$ (segmento de código de nivel tres).
+\item campo $esp0$ en fin de pila 0 (se pide nueva página y se le suma el tamaño de una página a esa
+dirección).
+\item campo $ss0$ en $0x0048$ (segmento de datos de nivel cero).
+\end{itemize}
+
+Finalmente para los descriptores estas $tss$ las llenamos igual que lo hicimos con 
+la $idle$ pero pasándole la dirección de su respectiva $tss$.\\
+
+Para saltar a la tarea $idle$ primero cargamos selector de descriptor $tss$ inicial con instrucción $ltr$.
+Luego ejecutamos un $jump$ a selector de descriptor $tss$ $idle$. Entonces la próxima instrucción sera
+de código de la $idle$. 
+
+
+

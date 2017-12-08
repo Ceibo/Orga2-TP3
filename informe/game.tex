@@ -1,0 +1,177 @@
+\subsection{Ejercicio 7: Estructuras y Lógica De Juego}
+\subsubsection{Estructuras}
+
+
+Para armar la lógica del juego tenemos entre varias estructuras la de $pirata$, $jugador$, $sched$ $task$ y $sched$.
+\begin{itemize}
+\item La estructura de $jugador$ tiene los siguientes campos: $indice$ que indica si es jugador $A$ o $B$, 
+array $piratas$ de tamaño ocho que contiene punteros a los piratas del jugador, dos arrays $vistas$ $x$ y
+$vistas$ $y$ que contienen posiciones vistas por pirata de jugador en cada turno. Luego sigue campo
+$puntos$, para guardar los puntos del jugador y campos $puerto$ $x$ y $puerto$ $y$, con posiciones iniciales
+en el mapa de los piratas del jugador.\\
+
+\item La estructura de $pirata$ tiene los siguientes campos: $id$ que indica en que índice de la $gdt$ está el
+descriptor de su $tss$ (no es selector); $index$, con valores entre 0 y 7, que sirve para indizar en el array de 
+piratas de jugador dueño; $jugador$ que es puntero a pirata dueño; $libre$ que es flag que indica si
+el slot en array $piratas$ de jugador asociado al pirata está libre; $x$ e $y$ que indican la posición del
+pirata en el mapa; $tipo$ que indica el tipo de pirata (minero o explorador) y $reloj$ indicando reloj del pirata.
+\\
+\item La estructura $sched$ tiene los siguientes campos: $tasks$ que es array de estructuras $sched$ $task$ $t$ y tiene
+tamaño 17, 16 tareas de jugadores más tarea idle; $current$ indicando índice de tarea actual en $tasks$; 
+campos $posiciones$ $tesoros$ $A$ y $posiciones$ $tesoros$ $B$ que son colas $fifo$ (first in first out) de 
+tuplas $x$ e $y$ y almacenan posiciones con monedas descubiertas por cada jugador; $inicio$ $tesoros$ $A$ y
+$inicio$ $tesoros$ $B$ que indican primer lugar ocupado de las colas de posiciones anteriores (al consultar
+posiciones de tesoros se chequean estos índices y se sacan usando su valor; luego se incrementan en uno apuntando
+al siguiente elemento de la cola y en caso de llegar al final de la cola apuntará al principio); campo $prox$
+que indica índice en $tasks$ de siguiente tarea a la actual y por último $tiempo$ $sin$ $cambios$ indicando 
+el tiempo de juego en que ningún jugador anotó puntos (sirve para finalizar juego).
+\\
+\item La estructura de $sched$ $task$ tiene los siguientes campos: $gdt$ $index$ que indica selector de $tss$ asociado
+a tarea en ese slot de array $tasks$, $pirata$ con puntero a tarea del $sched$ $task$, flags
+$reservado$ $minero$ y $reservado$ $explorador$ tal que al llegar scheduler a este $sched$ $task$ indican si 
+se debe activar la tarea y que tipo darle, $posiciOn$ $x$ $tesoro$ y $posiciOn$ $y$ $tesoro$ que en caso de 
+que se deba activar minero indican a donde buscar las monedas.
+\end{itemize}
+
+\subsubsection{Lógica del juego}
+ 
+Al iniciar juego se inicializan los jugadores asignándoles índice ($A$ o $B$), se setean puntos en 0, 
+inicializamos el mapa de cada jugador, pedimos las páginas libres para mapear las posiciones descubiertas y ser 
+accedidas por todos los piratas de cada jugador (las usan los mineros para moverse). Luego inicializamos los 
+piratas.\\
+Al iniciar piratas se asignan a los piratas de cada jugador (8 para cada jugador) un número $id$ que no cambia en 
+el resto del juego. El $id$ asocia a cada pirata con el índice del descriptor de su $tss$ en la $gdt$ (los $id$ 
+de los piratas de jugador $A$ están en rango desde 15 a 22 y los de jugador $B$ en rango desde 23 a 31). Entonces
+el scheduler puede ubicar el descriptor de $tss$ del pirata a través de su $id$ y usarlo para cambiar de tarea
+(shifteando en tres a izquierda al $id$ y sumando atributos obtenemos selector en $gdt$). Es decir que 
+inicialmente cada pirata de jugador tiene descriptor de $tss$ inicializada (asociada a una
+$tss$ vacía). Luego a los piratas se les asigna además del $id$ un índice, entre 0 y 7, para iterar en array
+de piratas de cada jugador. También se les asigna un puntero al jugador dueño y se les setea el campo $libre$ 
+en 1 ($true$) y campo $reloj$ en 0.\\
+    
+Luego se inicializa el scheduler, se asigna a cada posición de array $tasks$ (17 en total) un $sched$ $task$ 
+asociado a tarea, fijando en posiciones dadas por índice 1 a 8 tareas de $A$ y posiciones en índice 9 a 16 
+tareas de $B$; en índice 0 va la tarea $idle$.
+Se setean atributos de cada $sched$ $task$ seteando índice en gdt de su tarea, puntero a pirata de jugador, los 
+flags $reservado$ $explorador$ y $reservado$ $minero$ se setean en falso y parámetros de posiciones de tesoros se 
+ponen en 100 (vacías). 
+Como en posición 0 de array $tasks$ va la $idle$ al inicio el parámetro $current$ de scheduler
+ se setea en 0 (es la única activa).
+Luego se deben inicializar los arrays $posiciones$ $tesoros$ con tuplas de $x$ e $y$ en 100 indicando 
+posiciones vacías (con un máximo de 20 posiciones disponibles). También seteamos $prox$ en 500, indicando que
+la siguiente no es tarea de jugador.\\
+
+Luego de inicializar todo la única tarea activa es la $idle$. Si queremos lanzar piratas debemos usar las 
+interrupciones.
+
+\subsubsection{Interrupción de teclado}
+Al pulsar tecla de lanzar pirata ($shift L$ o $shift R$) se chequea en piratas de jugador si hay slot libre
+tal que en ese caso se debe setear en su $sched$ $task$ el campo $reservado$ $explorador$ como $true$ y 
+llenamos 
+los campos del pirata: $libre$ en falso, seteamos su posición con valores de puerto de jugador y le asignamos
+tipo explorador. No inicializamos su tss porque si activaramos tarea en interrupción de reloj se puede pisar 
+código en switch de tarea (puede suceder que siguiente tarea salga del mismo puerto y no sea explorador.
+Luego en esa posición física del mapa se pisará el código del explorador). Sin embargo si hay algún pirata
+en el puerto y hay slot libre se lanzará nuevo pirata pisandose el código del primero.\\
+Se debe chequear campo $prox$ de scheduler tal que si la tarea dada por $prox$ pertenece a mismo jugador que
+la tarea actual, la de $current$, y pirata lanzado es de jugador contrario a estos se debe 
+pisar $prox$ con índice de nueva tarea. Caso contrario (nueva tarea pertenece a jugador actual) no se toca $prox$.\\
+
+En caso de pulsar la tecla $y$ se activará el modo debug. Para esto usamos los flags $modo$ $debug$ y
+$pantalla$ $debug$ $activada$ que nos indican si el modo está activo o no. En caso de no activo al presionar
+tecla $y$ se setea $modo$ $debug$ en $true$ y ante cualquier excepción se mostrará una pantalla con información
+de los registros de la tarea que murió. Estos son: registros generales, que se obtienen directamente en handler de 
+excepción; el $eip$, se obtiene buceando en la pila, los segmentos de código, los eflags y registros de control. Todos se almacenan en estructura auxiliar
+llamada $debugger$ tal que al tener que imprimirse por pantalla estos valores los sacamos de ahí.\\
+Antes de mostrar la información por pantalla se debe resguardar pantalla actual de juego. Para esto usamos
+una matriz auxiliar de tamaño de la pantalla tal que al salir de modo debug de allí obtenemos los datos para 
+pintar la pantalla que se mostraba justo antes de la excepción. Este modo estará activo hasta que se presione
+la $y$ nuevamente en el juego. Durante tiempo en que está activo no se permite mover ni lanzar pirata.\\
+
+\subsubsection{Interrupción de reloj}
+En cada interrupción de reloj se consulta si el debugger está activo y si es así no se debe cambiar de tarea.
+Si debug no está activo llamamos $sched$ $atender$ $tick$. Esta función hace lo siguiente: actualiza el
+reloj global, el reloj del pirata actual y en caso de que $scheduler$ $tiempo$ $sin$ $cambios$ sea igual a
+10000 se dará por terminado el juego.\\
+Luego se chequea si hay slot de algún jugador seteado como libre
+(se chequean para cada jugador). 
+Si hay slot libre buscamos tarea en espera, es decir, se debe chequear en array $posiciones$ $tesoros$ de 
+scheduler asociado a jugador dueño de slot libre tal que si encuentra tupla con valores distinto de 100 (moneda descubierta) entonces 
+en estructura $sched$ $task$ del pirata libre se debe setear campo $minero$ en $true$ y copiar valores de tupla, $x$ e $y$, 
+a $posicion$ $x$ $tesoro$ y $posicion$ $y$ $tesoro$ de $sched$ $task$. Luego se restauran esos valores de
+ $posiciones$ $tesoros$ con 100 (indicando posición vacía) para próximas posiciones a guardar.
+Esto se debe repetir por cada slot vacío que se encuentre, es decir chequear si hay minero en espera por cada 
+slot vacío para cada jugador.\\
+
+Si campo $prox$ de scheduler está apuntando a tarea activa entonces actualizamos $current$ con ese $prox$ para
+switchear allí.\\
+ 
+Luego buscamos siguiente tarea perteneciente al jugador reciente y actualizamos parámetro $prox$ de scheduler tal 
+que en próximo switch de tareas se use esta tarea. Si no hay debe actualizarse $prox$ con siguiente de 
+jugador contrario a jugador reciente. En caso de no haber jugadores activos $prox$ no se actualiza.\\
+
+Si la tarea a switchear (dada por $current$ actualizado) estuviera reservada se debe activar pirata, inicializar 
+su $tss$ (incluye mapear su posición en mapa) y pintar. Luego se debe setear campo de reservado en falso.\\
+Si se reservo para minero se debe guardar en su pila de nivel $3$ los valores de campo $posicion$ $x$ $tesoro$, 
+$posicion$ $y$ $tesoro$ (posiciones donde cavar) y lanzar al minero. Esto se hace mapeando una página temporal apuntando a la pila y luego de copiar los datos la desmapeamos.\\
+Si estuviera reservado para explorador limpiamos el flag de reservado y lanzamos la tarea.
+Devolvemos el selector de tarea siguiente (dado por $current$ recientemente actualizado).\\
+
+Devuelta en handler de interrupción de reloj, con selector de siguiente tarea en $ax$, cargamos el selector actual
+con instrucción $str$ en registro $cx$ y comparamos $ax$ con $cx$. Si son distintos hacemos un jump $far$ a
+la siguiente tarea. Si son iguales se debe salir de la interrupción sin switchear. 
+
+
+\subsubsection{Interrupción de software $0x46$}
+Se chequea que caso de syscall se requiere. 
+\begin{itemize}
+\item Al mover:\\
+Se chequea que la posición nueva sea válida (dentro del mapa). Si no es así se mata la tarea.
+Si la nueva posición es válida se mueve su código a nueva posición en mapa. Para esto se mapea una página no usada por los jugadores a la anterior posición del pirata, luego se usa esta página para acceder al código de la tarea 
+y se lo copia a la nueva posición, que ya está mapeada (hecho al inicializar $tss$). Finalmente se desmapea
+esta página temporal.\\
+Luego si tipo de pirata es explorador chequeamos si en las posiciones descubiertas válidas (3 celdas en dirección 
+a mover) hay monedas. En caso de haber descubierto tesoro se busca tarea libre de jugador actual y en
+estructura $sched$ $task$ asociada al pirata se reserva como minero, guardando la posición del tesoro
+en campos $posicion$ $x$ $tesoro$, el $x$, $posicion$ $y$ $tesoro$, el $y$, para que el scheduler cuando llegue a 
+ese slot lo active y lo mande a esos lugares.\\
+Si no hay slot disponible para lanzar minero entonces guardar posición de tesoro descubierta 
+para cuando alguno se libere. Esto se almacena en array $posiciones$ $tesoros$ de $sched$ $task$ correspondiente 
+a jugador llamador. El scheduler ante primer interrupción se encargará de chequear si hay
+lugar y entonces lanzar minero. Si no hay posiciones libres en $posiciones$ $tesoros$ las monedas descubiertas se descartan.\\
+Si tipo de pirata es minero se chequea que su nueva posición esté mapeada. Esto se hace comprobando que la nueva 
+posición esté presente como dirección virtual, es decir que esté mapeada como $read$ $only$ entre las páginas mapeadas por los exploradores de un jugador. Si no es así se mata al pirata.
+	
+\item Al cavar:\\
+Se chequea que no se invoque con parámetros inválidos (campo $id$, tipo de tarea). Luego consultamos si hay 
+monedas en la posición actual y cuántas hay. Si hay cero entonces se debe matar la tarea. Si hay una o más 
+monedas se incrementa puntaje de jugador dueño de minero en uno y se decrementa cantidad de monedas en esa
+posición. 
+
+\item Consultar posición:\\
+Chequeamos que los parámetros sean válidos ($id$ de pirata válido y número de caso en rango dado por -1 y 7). 
+Luego retornamos la posición requerida codificada en un $uint32$. Como tenemos que devolver la posición al 
+llamador y la devolvemos por registro $eax$, a la hora de desarmar el stack pointer, cuando debemos
+restaurar el valor de $eax$ ignoramos el valor pusheado de eax incrementando el $esp$ en 4.
+ 
+
+\end{itemize}
+
+
+En todos los casos al final del procedimiento se debe saltar a la tarea $idle$.  
+
+
+\subsubsection{Excepciones (0 a 19)}
+Se mata a la tarea que produjo la excepción. Acá vienen a parar las tareas que realicen movimiento inválido,
+llamen a syscall con parámetros incorrectos y tiren las demás excepciones del procesador.\\
+Cuando la tarea muere se chequea si $prox$ de scheduler apunta a esta (tarea única). En ese 
+caso se debe setear $prox$ en default (500, ninguna tarea activa) y no se debe modificar campo $current$ (por más 
+que el pirata actual muera). También seteamos campo $libre$ del pirata con 1 y si el modo debug está activo 
+mostramos la información del pirata por pantalla, esto es, registros de uso general, $eflags$,
+registros de control y segmentos de código.\\
+Antes de salir del handler habilitamos las interrupciones, con instrucción $sti$, y luego saltamos a la tarea
+$idle$. En este caso no conservamos los registros de la tarea porque se la desaloja.
+
+
+ 
+
